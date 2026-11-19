@@ -1,0 +1,2 @@
+npx tsc --noEmit
+npx remotion still ExplainedShort --frame=60 --scale=0.5

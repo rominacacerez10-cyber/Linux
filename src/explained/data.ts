@@ -1,92 +1,149 @@
-export interface Scene {
-  id: string;
-  tag: string;
-  stepNumber: string;
-  title: string;
-  description: string;
-  stat?: string;
-  statLabel?: string;
-  highlightText?: string;
-  callToAction?: string;
-  durationInFrames: number;
-  accentColor: string;
+export type Layout = 'impact' | 'feed' | 'contrast' | 'data' | 'reveal' | 'cta';
+
+export type BadgeTone = 'alert' | 'hot' | 'meme' | 'info';
+
+export interface SceneBadge {
+  text: string;
+  tone: BadgeTone;
 }
 
-export const EXPLAINED_SCENES: Scene[] = [
+export interface SceneStat {
+  value: number;
+  suffix: string;
+  label: string;
+}
+
+export interface Scene {
+  id: string;
+  frames: number;
+  layout: Layout;
+  accent: string;
+  accent2: string;
+  badge: SceneBadge;
+  headline: string[];
+  sub: string;
+  stat?: SceneStat;
+  tags: string[];
+  timestamp: string;
+}
+
+export interface SafeZone {
+  top: number;
+  bottom: number;
+  left: number;
+  right: number;
+}
+
+export const FPS = 30;
+export const WIDTH = 1080;
+export const HEIGHT = 1920;
+
+export const SAFE: SafeZone = {
+  top: 220,
+  bottom: 480,
+  left: 60,
+  right: 140,
+};
+
+export const SCENES: Scene[] = [
   {
-    id: 'hook',
-    stepNumber: '01',
-    tag: 'HORA CERO 🔥',
-    title: 'SE CAYÓ MEDIO INTERNET',
-    description: 'Minuto 1 del lanzamiento: servidores de descarga colapsados y streamers gritando en vivo.',
-    stat: '12M+',
-    statLabel: 'personas intentando entrar al mismo segundo',
-    highlightText: '12 años esperando este momento exacto',
-    durationInFrames: 165, // 5.5 seg
-    accentColor: '#ff2a85',
+    id: 'scene-01-impact',
+    frames: 150,
+    layout: 'impact',
+    accent: '#ff2e93',
+    accent2: '#ff7a3d',
+    badge: { text: 'ALERTA ROJA', tone: 'alert' },
+    headline: ['ABRIERON', 'LAS PUERTAS', 'DE VICE CITY'],
+    sub: 'Servidores colapsados y streamers gritando en vivo.',
+    stat: { value: 12, suffix: 'M+', label: 'intentos en simultáneo' },
+    tags: ['#GTAVI', '#ViceCity', '#Lanzamiento'],
+    timestamp: 'T+00:00:14',
   },
   {
-    id: 'chaos-networks',
-    stepNumber: '02',
-    tag: 'EL COLAPSO TOTAL 🌐',
-    title: 'TIKTOK Y TWITTER SON PURO SPOILER',
-    description: 'Nadie durmió. Cero trabajo al día siguiente. 40 millones de clips subidos en 2 horas.',
-    stat: '#1',
-    statLabel: 'tendencia global en todas las redes sociales',
-    highlightText: 'Tu feed está 100% secuestrado por Vice City',
-    durationInFrames: 170, // ~5.66 seg
-    accentColor: '#00f0ff',
+    id: 'scene-02-feed',
+    frames: 180,
+    layout: 'feed',
+    accent: '#00e5ff',
+    accent2: '#ff2e93',
+    badge: { text: 'TENDENCIA', tone: 'hot' },
+    headline: ['EL FEED', 'EXPLOTÓ POR', 'COMPLETO'],
+    sub: 'Cero horas de sueño y spoilers en cada esquina.',
+    stat: { value: 40, suffix: 'M', label: 'clips compartidos' },
+    tags: ['#Spoilers', '#ViceClips', '#SinDormir'],
+    timestamp: 'T+00:42:08',
   },
   {
-    id: 'first-chaos',
-    stepNumber: '03',
-    tag: 'LA COMUNIDAD EN ACCIÓN 🐊',
-    title: 'LO PRIMERO QUE HIZO LA GENTE...',
-    description: 'Olvídate de la misión principal: todos fueron directo a robar tanques y atropellar cocodrilos.',
-    stat: '0%',
-    statLabel: 'de respeto a las leyes de tránsito',
-    highlightText: 'El caos en Vice Beach empezó al minuto 3',
-    durationInFrames: 175, // ~5.83 seg
-    accentColor: '#ffe600',
+    id: 'scene-03-contrast',
+    frames: 180,
+    layout: 'contrast',
+    accent: '#ff7a3d',
+    accent2: '#ffe600',
+    badge: { text: 'MODO CAOS', tone: 'meme' },
+    headline: ['COMUNIDAD VS', 'LEYES DE LA', 'CALLE REAL'],
+    sub: 'Nadie tocó la historia: todos a cazar cocodrilos.',
+    tags: ['#ViceBeach', '#ModoCaos', '#LeyesCero'],
+    timestamp: 'T+01:15:32',
   },
   {
-    id: 'physics-details',
-    stepNumber: '04',
-    tag: 'FÍSICAS DEMENCIALES 🚗',
-    title: 'DETALLES QUE TE DEJAN LOCO',
-    description: 'El agua se mueve real, la ropa se moja por capas y cada choque deforma la chapa al milímetro.',
-    stat: '4K/60',
-    statLabel: 'gráficos que parecen una película callejera',
-    highlightText: 'Rockstar redefinió lo que puede hacer una consola',
-    durationInFrames: 175, // ~5.83 seg
-    accentColor: '#10b981',
+    id: 'scene-04-data',
+    frames: 180,
+    layout: 'data',
+    accent: '#00e5ff',
+    accent2: '#2a0845',
+    badge: { text: 'FÍSICAS TOP', tone: 'info' },
+    headline: ['DETALLES QUE', 'TE ROMPEN', 'LA CABEZA'],
+    sub: 'Físicas hiperrealistas en cada centímetro de chapa.',
+    stat: { value: 60, suffix: ' FPS', label: 'fidelidad visual extrema' },
+    tags: ['#NextGen', '#Graficazos', '#Fisicas'],
+    timestamp: 'T+01:58:19',
   },
   {
-    id: 'unexpected',
-    stepNumber: '05',
-    tag: 'NADIE LO VENÍA VENIR 🤯',
-    title: 'LOS NPCS AHORA TIENEN MEMORIA',
-    description: 'Si le pegas a alguien en una esquina, te reconoce horas después y llama a la policía con su móvil.',
-    stat: 'IA TOP',
-    statLabel: 'reacciones únicas para cada habitante',
-    highlightText: 'El juego se siente vivo como nunca antes',
-    durationInFrames: 170, // ~5.66 seg
-    accentColor: '#a855f7',
+    id: 'scene-05-reveal',
+    frames: 170,
+    layout: 'reveal',
+    accent: '#ff2e93',
+    accent2: '#00e5ff',
+    badge: { text: 'GIRO TOTAL', tone: 'hot' },
+    headline: ['LOS NPCS YA', 'NO PERDONAN', 'NADA AMIGO'],
+    sub: 'Si la lías en una esquina te recuerdan y te buscan.',
+    tags: ['#NPCsVivos', '#PlotTwist', '#ViceCityIA'],
+    timestamp: 'T+02:33:04',
   },
   {
-    id: 'closing-hype',
-    stepNumber: '06',
-    tag: 'EL VEREDICTO FINAL 👑',
-    title: '¿VALIÓ LA PENA LA ESPERA?',
-    description: 'El mayor evento en la historia de los videojuegos ya está aquí. Guarda esto y no te comas spoilers.',
-    highlightText: 'Vice City te está esperando',
-    callToAction: '¿PS5, Xbox o esperas a PC? ¡Comenta abajo! 👇🎮',
-    durationInFrames: 165, // 5.5 seg
-    accentColor: '#ff0055',
+    id: 'scene-06-cta',
+    frames: 160,
+    layout: 'cta',
+    accent: '#ffe600',
+    accent2: '#ff2e93',
+    badge: { text: 'TU TURNO', tone: 'hot' },
+    headline: ['¿CONSOLA HOY', 'O ESPERAS', 'A LA PC?'],
+    sub: 'Comenta tu bando abajo antes de que te spoileen todo.',
+    stat: { value: 89, suffix: 'K', label: 'debates encendidos' },
+    tags: ['#GamerLatino', '#Debate', '#ViceVeredicto'],
+    timestamp: 'T+03:00:00',
   },
 ];
 
-export const TOTAL_DURATION_IN_FRAMES = EXPLAINED_SCENES.reduce(
-  (sum, scene) => sum + scene.durationInFrames,
+export const TOTAL_FRAMES: number = SCENES.reduce(
+  (accum, scene) => accum + scene.frames,
   0
 );
+
+export const SCENE_STARTS: number[] = SCENES.reduce<number[]>(
+  (starts, scene, index) => {
+    if (index === 0) {
+      return [0];
+    }
+    const prevStart = starts[index - 1];
+    const prevFrames = SCENES[index - 1].frames;
+    starts.push(prevStart + prevFrames);
+    return starts;
+  },
+  []
+);
+
+if (TOTAL_FRAMES !== 1020) {
+  throw new Error(
+    `Error de sincronización en data.ts: TOTAL_FRAMES debe ser exactamente 1020, pero se calcularon ${TOTAL_FRAMES}. Revisa los frames de cada escena.`
+  );
+}
