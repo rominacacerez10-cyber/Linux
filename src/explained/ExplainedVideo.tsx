@@ -13,7 +13,7 @@ export const EXPLAINED_CONFIG = {
 export const ExplainedVideo: React.FC = () => {
   const frame = useCurrentFrame();
 
-  // Progreso general continuo del video de 0 a 100%
+  // Barra continua superior de 0% a 100%
   const globalProgress = interpolate(
     frame,
     [0, TOTAL_DURATION_IN_FRAMES - 1],
@@ -27,20 +27,20 @@ export const ExplainedVideo: React.FC = () => {
   return (
     <AbsoluteFill
       style={{
-        backgroundColor: '#07090e',
+        backgroundColor: '#07060f',
         backgroundImage:
-          'radial-gradient(circle at 50% 15%, rgba(56, 189, 248, 0.12), transparent 45%), radial-gradient(circle at 80% 85%, rgba(168, 85, 247, 0.1), transparent 40%)',
+          'radial-gradient(circle at 20% 20%, rgba(255, 42, 133, 0.22), transparent 45%), radial-gradient(circle at 80% 75%, rgba(0, 240, 255, 0.18), transparent 45%), radial-gradient(circle at 50% 50%, rgba(168, 85, 247, 0.12), transparent 50%)',
         overflow: 'hidden',
       }}
     >
-      {/* Barra de progreso superior interactiva (dentro de safe zone superior) */}
+      {/* Barra de progreso superior en safe-margin */}
       <div
         style={{
           position: 'absolute',
           top: 72,
-          left: 60,
-          right: 60,
-          height: 8,
+          left: 64,
+          right: 64,
+          height: 10,
           backgroundColor: 'rgba(255, 255, 255, 0.15)',
           borderRadius: 999,
           overflow: 'hidden',
@@ -51,14 +51,14 @@ export const ExplainedVideo: React.FC = () => {
           style={{
             width: `${globalProgress}%`,
             height: '100%',
-            backgroundColor: '#38bdf8',
-            boxShadow: '0 0 16px rgba(56, 189, 248, 0.8)',
+            background: 'linear-gradient(90deg, #ff2a85, #00f0ff)',
+            boxShadow: '0 0 20px rgba(0, 240, 255, 0.9)',
             borderRadius: 999,
           }}
         />
       </div>
 
-      {/* Secuencia cronológica de escenas */}
+      {/* Secuencia continua de escenas */}
       <Series>
         {EXPLAINED_SCENES.map((scene, index) => (
           <Series.Sequence

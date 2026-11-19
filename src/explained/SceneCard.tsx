@@ -22,32 +22,31 @@ export const SceneCard: React.FC<SceneCardProps> = ({
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
-  // Entrada con rebote controlado
+  // Entrada con spring rápido y contundente
   const entrance = spring({
     frame,
     fps,
     config: {
-      damping: 14,
-      stiffness: 110,
-      mass: 0.85,
+      damping: 12,
+      stiffness: 140,
+      mass: 0.75,
     },
   });
 
-  // Entrada escalonada de elementos
   const titleEntrance = spring({
-    frame: Math.max(0, frame - 5),
+    frame: Math.max(0, frame - 4),
     fps,
-    config: { damping: 14, stiffness: 120 },
+    config: { damping: 13, stiffness: 130 },
   });
 
   const cardEntrance = spring({
-    frame: Math.max(0, frame - 10),
+    frame: Math.max(0, frame - 8),
     fps,
-    config: { damping: 15, stiffness: 120 },
+    config: { damping: 14, stiffness: 130 },
   });
 
-  // Salida suave antes del cambio de escena
-  const exitFrames = 12;
+  // Salida rápida antes del corte de escena
+  const exitFrames = 10;
   const exitProgress = interpolate(
     frame,
     [scene.durationInFrames - exitFrames, scene.durationInFrames],
@@ -61,7 +60,7 @@ export const SceneCard: React.FC<SceneCardProps> = ({
   const containerOpacity =
     interpolate(entrance, [0, 1], [0, 1]) * (1 - exitProgress);
   const containerTranslateY =
-    interpolate(entrance, [0, 1], [50, 0]) - exitProgress * 40;
+    interpolate(entrance, [0, 1], [40, 0]) - exitProgress * 30;
 
   return (
     <AbsoluteFill
@@ -69,12 +68,12 @@ export const SceneCard: React.FC<SceneCardProps> = ({
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
-        /* Márgenes seguros para TikTok/Reels/Facebook (evita botones laterales, header y pie) */
-        padding: '170px 76px 240px 76px',
+        /* Márgenes seguros para TikTok, Reels y Facebook */
+        padding: '175px 76px 250px 76px',
         boxSizing: 'border-box',
         color: '#ffffff',
         fontFamily:
-          '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+          '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Impact, sans-serif',
       }}
     >
       <div
@@ -83,10 +82,10 @@ export const SceneCard: React.FC<SceneCardProps> = ({
           transform: `translateY(${containerTranslateY}px)`,
           display: 'flex',
           flexDirection: 'column',
-          gap: 28,
+          gap: 26,
         }}
       >
-        {/* Header de escena con badge y contador */}
+        {/* Cabecera con Badge neón y contador */}
         <div
           style={{
             display: 'flex',
@@ -98,15 +97,16 @@ export const SceneCard: React.FC<SceneCardProps> = ({
             style={{
               display: 'inline-flex',
               alignItems: 'center',
-              backgroundColor: `${scene.accentColor}20`,
+              backgroundColor: `${scene.accentColor}25`,
               color: scene.accentColor,
               border: `2px solid ${scene.accentColor}`,
-              padding: '10px 22px',
+              padding: '10px 24px',
               borderRadius: 999,
-              fontSize: 22,
-              fontWeight: 800,
-              letterSpacing: 2,
+              fontSize: 24,
+              fontWeight: 900,
+              letterSpacing: 2.2,
               textTransform: 'uppercase',
+              boxShadow: `0 0 20px ${scene.accentColor}40`,
             }}
           >
             {scene.tag}
@@ -114,82 +114,85 @@ export const SceneCard: React.FC<SceneCardProps> = ({
 
           <span
             style={{
-              fontSize: 22,
-              color: 'rgba(255,255,255,0.45)',
-              fontWeight: 700,
-              letterSpacing: 1.5,
+              fontSize: 24,
+              color: 'rgba(255,255,255,0.5)',
+              fontWeight: 800,
+              letterSpacing: 2,
             }}
           >
-            {sceneIndex + 1} / {totalScenes}
+            PARTE {sceneIndex + 1}/{totalScenes}
           </span>
         </div>
 
-        {/* Título Principal */}
+        {/* Título de impacto estilo Vice City */}
         <h1
           style={{
-            fontSize: 66,
-            lineHeight: 1.15,
-            fontWeight: 900,
-            letterSpacing: -1.8,
-            margin: '8px 0 0 0',
+            fontSize: 68,
+            lineHeight: 1.1,
+            fontWeight: 950,
+            letterSpacing: -2,
+            margin: '6px 0 0 0',
+            textTransform: 'uppercase',
             opacity: interpolate(titleEntrance, [0, 1], [0, 1]),
             transform: `translateY(${interpolate(
               titleEntrance,
               [0, 1],
               [24, 0]
             )}px)`,
-            textShadow: '0 4px 24px rgba(0,0,0,0.4)',
+            textShadow: `0 0 28px ${scene.accentColor}50, 0 4px 18px rgba(0,0,0,0.8)`,
           }}
         >
           {scene.title}
         </h1>
 
-        {/* Descripción legible */}
+        {/* Descripción callejera legible */}
         <p
           style={{
-            fontSize: 34,
-            lineHeight: 1.4,
-            color: '#cbd5e1',
+            fontSize: 35,
+            lineHeight: 1.38,
+            color: '#e2e8f0',
             margin: 0,
-            fontWeight: 400,
+            fontWeight: 500,
           }}
         >
           {scene.description}
         </p>
 
-        {/* Bloque estadístico si aplica */}
+        {/* Estadísticas / Dato curioso */}
         {scene.stat && (
           <div
             style={{
-              marginTop: 8,
-              padding: '24px 32px',
-              backgroundColor: 'rgba(255, 255, 255, 0.04)',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
+              marginTop: 6,
+              padding: '24px 30px',
+              backgroundColor: 'rgba(15, 23, 42, 0.75)',
+              border: `2px solid ${scene.accentColor}55`,
               borderRadius: 24,
               display: 'flex',
               alignItems: 'center',
-              gap: 28,
+              gap: 26,
               opacity: interpolate(cardEntrance, [0, 1], [0, 1]),
               transform: `scale(${interpolate(cardEntrance, [0, 1], [0.94, 1])})`,
-              backdropFilter: 'blur(8px)',
+              boxShadow: `0 10px 30px rgba(0,0,0,0.5), inset 0 0 15px ${scene.accentColor}15`,
             }}
           >
             <span
               style={{
-                fontSize: 68,
-                fontWeight: 900,
+                fontSize: 66,
+                fontWeight: 950,
                 color: scene.accentColor,
                 lineHeight: 1,
+                letterSpacing: -1,
+                textShadow: `0 0 20px ${scene.accentColor}60`,
               }}
             >
               {scene.stat}
             </span>
             <span
               style={{
-                fontSize: 26,
+                fontSize: 27,
                 lineHeight: 1.3,
-                color: '#e2e8f0',
-                fontWeight: 600,
+                color: '#f8fafc',
+                fontWeight: 700,
               }}
             >
               {scene.statLabel}
@@ -197,37 +200,38 @@ export const SceneCard: React.FC<SceneCardProps> = ({
           </div>
         )}
 
-        {/* Tarjeta de punto clave */}
+        {/* Tarjeta de dato destacado */}
         {scene.highlightText && (
           <div
             style={{
-              padding: '22px 28px',
-              backgroundColor: 'rgba(255, 255, 255, 0.05)',
+              padding: '22px 26px',
+              backgroundColor: 'rgba(255, 255, 255, 0.06)',
               borderRadius: 18,
-              borderLeft: `8px solid ${scene.accentColor}`,
-              fontSize: 30,
-              fontWeight: 700,
+              borderLeft: `10px solid ${scene.accentColor}`,
+              fontSize: 31,
+              fontWeight: 800,
               color: '#ffffff',
-              boxShadow: '0 8px 30px rgba(0,0,0,0.3)',
+              boxShadow: '0 8px 30px rgba(0,0,0,0.4)',
             }}
           >
-            💡 {scene.highlightText}
+            ⚡ {scene.highlightText}
           </div>
         )}
       </div>
 
-      {/* Call to action de cierre en la parte inferior de la zona segura */}
+      {/* Call to action de cierre en zona segura */}
       {scene.callToAction && (
         <div
           style={{
             textAlign: 'center',
             backgroundColor: `${scene.accentColor}25`,
-            border: `2px dashed ${scene.accentColor}`,
-            padding: '20px 24px',
-            borderRadius: 20,
-            fontSize: 27,
-            fontWeight: 700,
+            border: `3px solid ${scene.accentColor}`,
+            padding: '22px 26px',
+            borderRadius: 22,
+            fontSize: 30,
+            fontWeight: 900,
             color: '#ffffff',
+            boxShadow: `0 0 25px ${scene.accentColor}60`,
             opacity: interpolate(cardEntrance, [0, 1], [0, 1]),
           }}
         >
