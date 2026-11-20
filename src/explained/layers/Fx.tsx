@@ -60,6 +60,19 @@ export const Fx: React.FC<FxProps> = ({
   // 4. Whip pan blur style
   const blurPx = Math.max(0, whipBlur);
 
+  // 5. Protección del cierre: en el último tramo nunca permitimos
+  // flashes blancos ni light leaks intensos que laven el plano.
+  const isFinale = frame >= 900;
+  const safeFlashOpacity = isFinale
+    ? 0
+    : Math.min(0.45, Math.max(0, flashOpacity));
+  const safeLightLeak = isFinale
+    ? Math.min(0.05, Math.max(0, lightLeakOpacity))
+    : lightLeakOpacity;
+  const safeVignette = isFinale
+    ? Math.max(0.55, vignetteOpacity)
+    : vignetteOpacity;
+
   return (
     <AbsoluteFill
       style={{
@@ -81,10 +94,10 @@ export const Fx: React.FC<FxProps> = ({
       )}
 
       {/* Light Leaks Synthwave (Magenta / Naranja / Cian) */}
-      {lightLeakOpacity > 0 && (
+      {safeLightLeak > 0 && (
         <AbsoluteFill
           style={{
-            opacity: lightLeakOpacity,
+            opacity: safeLightLeak,
             mixBlendMode: 'screen',
             background: `radial-gradient(circle at ${30 + leakX}% ${20 + leakY}%, rgba(255, 46, 147, 0.6) 0%, transparent 60%),
                          radial-gradient(circle at ${80 - leakX}% ${75 - leakY}%, rgba(0, 229, 255, 0.5) 0%, transparent 55%),
@@ -107,10 +120,10 @@ export const Fx: React.FC<FxProps> = ({
       )}
 
       {/* Viñeta cinematográfica retro */}
-      {vignetteOpacity > 0 && (
+      {safeVignette > 0 && (
         <AbsoluteFill
           style={{
-            opacity: vignetteOpacity,
+            opacity: safeVignette,
             boxShadow: 'inset 0 0 160px 40px #07030f, inset 0 0 280px 80px rgba(42, 8, 69, 0.7)',
           }}
         />
@@ -157,6 +170,14 @@ export const Fx: React.FC<FxProps> = ({
           />
         ))}
 
+      {/* Color Grade cinematográfico (5-layer stack: curva de contraste y saturación sutil) */}
+      <AbsoluteFill
+        style={{
+          backdropFilter: 'contrast(1.08) saturate(1.15)',
+          pointerEvents: 'none',
+        }}
+      />
+
       {/* Grano de película animado vía SVG feTurbulence determinista */}
       {grainOpacity > 0 && (
         <AbsoluteFill
@@ -190,11 +211,11 @@ export const Fx: React.FC<FxProps> = ({
       )}
 
       {/* Flash blanco / de color */}
-      {flashOpacity > 0 && (
+      {safeFlashOpacity > 0 && (
         <AbsoluteFill
           style={{
             backgroundColor: flashColor,
-            opacity: Math.min(0.6, Math.max(0, flashOpacity)),
+            opacity: safeFlashOpacity,
             mixBlendMode: 'lighten',
           }}
         />

@@ -2,9 +2,7 @@ import React from 'react';
 import { interpolate, spring, useCurrentFrame, useVideoConfig } from 'remotion';
 import { FPS, SCENES, SCENE_STARTS, VO_DELAY } from './data';
 import { VO_TIMINGS } from './timings';
-
-const FONT_DISPLAY =
-  'Anton, Impact, "Arial Black", -apple-system, sans-serif';
+import { theme } from '../theme';
 
 interface WordInfo {
   text: string;
@@ -31,7 +29,7 @@ export const Captions: React.FC = () => {
       const globalStartFrame = voStartFrame + Math.round(w.startSec * FPS);
       const globalEndFrame = voStartFrame + Math.round(w.endSec * FPS);
       allWords.push({
-        text: w.text,
+        text: String(w.text ?? '').trim(),
         globalStartFrame,
         globalEndFrame,
         accentColor: accent,
@@ -49,24 +47,36 @@ export const Captions: React.FC = () => {
     return null;
   }
 
-  // Agrupar 2 palabras a la vez sin encimarse
+  // Agrupar 2 palabras a la vez con separación visual limpia y amplia
   const windowSize = 2;
   const chunkIndex = Math.floor(activeIndex / windowSize);
   const startIndex = chunkIndex * windowSize;
   const visibleWords = allWords.slice(startIndex, startIndex + windowSize);
 
+  // Tamaño adaptativo: evita que dos palabras largas desborden y se toquen
+  const visibleLength = visibleWords.reduce(
+    (total, word) => total + word.text.length,
+    0
+  );
+  const fontSize =
+    visibleLength > 24 ? 52 : visibleLength > 18 ? 58 : visibleLength > 12 ? 64 : 70;
+
   return (
     <div
       style={{
         position: 'absolute',
-        top: 1140,
-        left: 60,
-        right: 140,
+        top: 1300,
+        left: 0,
+        width: '100%',
+        paddingLeft: 36,
+        paddingRight: 36,
+        boxSizing: 'border-box',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
+        flexDirection: 'row',
         flexWrap: 'nowrap',
-        gap: 20,
+        gap: 36,
         pointerEvents: 'none',
         zIndex: 50,
       }}
@@ -82,34 +92,57 @@ export const Captions: React.FC = () => {
           ? spring({
               frame: currentFrame - word.globalStartFrame,
               fps,
-              config: { damping: 10, stiffness: 180, mass: 0.5 },
+              config: theme.spring.snappy,
             })
           : 0;
 
-        const scale = isCurrent ? interpolate(pop, [0, 1], [0.95, 1.1]) : 1.0;
-        const color = isCurrent ? word.accentColor : isPast ? '#ffffff' : 'rgba(255,255,255,0.45)';
+        const scale = isCurrent ? interpolate(pop, [0, 1], [0.96, 1.12]) : 1.0;
+        const color = isCurrent
+          ? word.accentColor
+          : isPast
+            ? '#ffffff'
+            : 'rgba(255,255,255,0.4)';
 
         return (
-          <span
-            key={`${word.text}-${idx}-${word.globalStartFrame}`}
-            style={{
-              fontFamily: FONT_DISPLAY,
-              fontSize: 58,
-              lineHeight: 1.1,
-              fontWeight: 900,
-              textTransform: 'uppercase',
-              letterSpacing: 2,
-              color,
-              transform: `scale(${scale})`,
-              display: 'inline-block',
-              whiteSpace: 'nowrap',
-              textShadow: isCurrent
-                ? `0 0 24px ${word.accentColor}, -3px -3px 0 #000, 3px -3px 0 #000, -3px 3px 0 #000, 3px 3px 0 #000, 0 8px 18px rgba(0,0,0,0.9)`
-                : '-2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000, 0 6px 12px rgba(0,0,0,0.8)',
-            }}
-          >
-            {word.text}
-          </span>
+          <React.Fragment key={`${word.text}-${idx}-${word.globalStartFrame}`}>
+            {/* Separador físico: garantiza espacio incluso si el motor ignora gap */}
+            {idx > 0 && (
+              <span
+                aria-hidden
+                style={{
+                  display: 'inline-block',
+                  width: 22,
+                  flex: '0 0 22px',
+                }}
+              />
+            )}
+            <span
+              style={{
+                fontFamily: theme.fonts.display,
+                fontSize,
+                lineHeight: 1.08,
+                fontWeight: 900,
+                textTransform: 'uppercase',
+                letterSpacing: 2,
+                color,
+                transform: `scale(${scale})`,
+                display: 'inline-block',
+                flex: '0 0 auto',
+                whiteSpace: 'nowrap',
+                padding: '6px 16px',
+                boxSizing: 'content-box',
+                // Contorno negro grueso + sombras duras para legibilidad total sobre neón
+                WebkitTextStroke: '12px #000000',
+                paintOrder: 'stroke fill',
+                textShadow: isCurrent
+                  ? `0 0 32px ${word.accentColor}, 0 0 12px ${word.accentColor}, 4px 4px 0 #000, -4px 4px 0 #000, 0 9px 18px rgba(0,0,0,0.98)`
+                  : '4px 4px 0 #000, -4px 4px 0 #000, 0 7px 16px rgba(0,0,0,0.98)',
+                filter: 'drop-shadow(0 7px 14px rgba(0,0,0,0.98))',
+              }}
+            >
+              {word.text}
+            </span>
+          </React.Fragment>
         );
       })}
     </div>

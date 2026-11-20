@@ -38,12 +38,6 @@ export const Scene06: React.FC = () => {
     },
   ];
 
-  // Blinding white/magenta flash near frame 160 to match frame 0
-  const endFlashOpacity = interpolate(frame, [120, 158, 160], [0, 0.95, 1], {
-    extrapolateLeft: 'clamp',
-    extrapolateRight: 'clamp',
-  });
-
   return (
     <AbsoluteFill style={{ backgroundColor: '#07030f', overflow: 'hidden' }}>
       <ThreeCanvas
@@ -51,13 +45,44 @@ export const Scene06: React.FC = () => {
         height={HEIGHT}
         style={{ width: '100%', height: '100%' }}
       >
-        <Lights fogColor="#2a0845" fogNear={15} fogFar={120} />
+        {/* Niebla profunda y oscura para mantener alto contraste sin quemar en blanco */}
+        <Lights fogColor="#150325" fogNear={45} fogFar={340} />
         <CameraRig frame={frame} shots={shots} />
 
         {/* Rooftop Building structure */}
         <mesh position={[0, 5, 5]}>
           <boxGeometry args={[14, 10, 14]} />
-          <meshStandardMaterial color="#1a0a2a" roughness={0.8} />
+          <meshStandardMaterial
+            color="#1a0a2a"
+            emissive="#0d0418"
+            emissiveIntensity={0.5}
+            roughness={0.7}
+            metalness={0.4}
+          />
+        </mesh>
+
+        {/* Filos de neón en la azotea para el cierre Vice City */}
+        <mesh position={[-7.03, 10.04, 5]}>
+          <boxGeometry args={[0.12, 0.12, 14]} />
+          <meshStandardMaterial color="#ff2e93" emissive="#ff2e93" emissiveIntensity={3.2} toneMapped={false} />
+        </mesh>
+        <mesh position={[7.03, 10.04, 5]}>
+          <boxGeometry args={[0.12, 0.12, 14]} />
+          <meshStandardMaterial color="#00e5ff" emissive="#00e5ff" emissiveIntensity={3.2} toneMapped={false} />
+        </mesh>
+        <mesh position={[0, 10.04, -2.03]}>
+          <boxGeometry args={[14, 0.12, 0.12]} />
+          <meshStandardMaterial color="#00e5ff" emissive="#00e5ff" emissiveIntensity={2.8} toneMapped={false} />
+        </mesh>
+        <mesh position={[0, 10.04, 12.03]}>
+          <boxGeometry args={[14, 0.12, 0.12]} />
+          <meshStandardMaterial color="#ff2e93" emissive="#ff2e93" emissiveIntensity={2.8} toneMapped={false} />
+        </mesh>
+
+        {/* Halo cálido del horizonte detrás del skyline */}
+        <mesh position={[0, 22, -300]}>
+          <planeGeometry args={[420, 120]} />
+          <meshBasicMaterial color="#3a0a4a" transparent opacity={0.55} toneMapped={false} />
         </mesh>
 
         {/* Player standing on roof edge facing distant skyline */}
@@ -73,21 +98,9 @@ export const Scene06: React.FC = () => {
         {/* Swaying Palms on rooftop garden */}
         <Palms offsetZ={-frame * 0.2} count={6} spacing={8} />
 
-        {/* City Skyline */}
+        {/* City Skyline con ventanas y neones nítidos */}
         <City frame={frame} speed={0.05} />
       </ThreeCanvas>
-
-      {/* Blinding transition overlay at the end to match frame 0 (looping) */}
-      {endFlashOpacity > 0 && (
-        <AbsoluteFill
-          style={{
-            backgroundColor: '#ffffff',
-            opacity: endFlashOpacity,
-            mixBlendMode: 'screen',
-            pointerEvents: 'none',
-          }}
-        />
-      )}
     </AbsoluteFill>
   );
 };

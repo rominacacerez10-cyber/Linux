@@ -7,51 +7,60 @@ interface LightsProps {
 }
 
 export const Lights: React.FC<LightsProps> = ({
-  fogColor = '#2a0845',
-  fogNear = 35,
-  fogFar = 280,
+  fogColor = '#170326',
+  fogNear = 38,
+  fogFar = 300,
 }) => {
   return (
     <>
-      {/* Niebla púrpura para ocultar el fondo y dar profundidad volumétrica */}
+      {/* Fondo y niebla púrpura profunda para contraste cinematográfico */}
       <color attach="background" args={[fogColor]} />
       <fog attach="fog" args={[fogColor, fogNear, fogFar]} />
 
-      {/* Luz hemisférica atardecer Vice City: cielo dorado/ámbar cálido, suelo púrpura profundo */}
-      <hemisphereLight args={['#ffbe53', '#1e053a', 0.95]} />
+      {/* Atmósfera Vice City: cielo ámbar cálido sobre suelo púrpura nocturno */}
+      <hemisphereLight args={['#ff9a4d', '#0d0018', 0.72]} />
 
-      {/* Luz ambiente complementaria baja */}
-      <ambientLight color="#150528" intensity={0.5} />
+      {/* Relleno ambiental muy bajo para conservar negros profundos */}
+      <ambientLight color="#120022" intensity={0.34} />
 
-      {/* Luz direccional sol poniente (magenta / atardecer) */}
+      {/* Sol poniente magenta: key light frontal que esculpe los volúmenes */}
       <directionalLight
         position={[-30, 45, 60]}
         color="#ff2e93"
-        intensity={2.8}
+        intensity={2.35}
       />
 
-      {/* Rim light cian lateral para acentuar siluetas y filos PBR */}
+      {/* Rim light cian lateral para separar siluetas del fondo */}
       <directionalLight
         position={[35, 25, -40]}
         color="#00e5ff"
-        intensity={2.2}
+        intensity={1.85}
       />
 
-      {/* Point light cian para contraste y reflejos en asfalto/vehículos */}
+      {/* Contraluz magenta bajo para rebotes neón en asfalto y carrocerías */}
       <pointLight
-        position={[25, 15, -20]}
-        color="#00e5ff"
-        intensity={3.8}
-        distance={130}
+        position={[-28, 8, -34]}
+        color="#ff2e93"
+        intensity={2.6}
+        distance={120}
         decay={2}
       />
 
-      {/* Relleno cálido frontal rasante */}
+      {/* Reflejos cian fríos sobre la calzada */}
+      <pointLight
+        position={[25, 15, -20]}
+        color="#00e5ff"
+        intensity={4.2}
+        distance={140}
+        decay={2}
+      />
+
+      {/* Relleno cálido frontal rasante sobre personajes y vehículos */}
       <pointLight
         position={[0, 2.5, 10]}
         color="#ff7a3d"
-        intensity={1.5}
-        distance={70}
+        intensity={2.1}
+        distance={80}
         decay={2}
       />
     </>

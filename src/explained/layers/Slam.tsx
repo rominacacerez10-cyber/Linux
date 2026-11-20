@@ -1,6 +1,7 @@
 import React from 'react';
-import { AbsoluteFill, spring, random } from 'remotion';
+import { AbsoluteFill, spring, random, interpolate } from 'remotion';
 import { FPS, SAFE } from '../data';
+import { theme } from '../../theme';
 
 export interface SlamProps {
   frame: number;
@@ -26,7 +27,7 @@ export const Slam: React.FC<SlamProps> = ({
   accentColor = '#ff2e93',
   glowColor = '#00e5ff',
   fontSize = 94,
-  positionY = 560,
+  positionY = 230,
   shakeIntensity = 18,
   shakeDecayFrames = 12,
   aberration = 8,
@@ -45,19 +46,27 @@ export const Slam: React.FC<SlamProps> = ({
     );
   }
 
-  // Spring explosivo inicial con rebote
+  // Entrada multi-propiedad (escala + translateY + opacidad) con spring cinematográfico
   const scale = spring({
     frame: relFrame,
     fps: FPS,
-    config: {
-      damping: 10,
-      mass: 0.4,
-      stiffness: 220,
-      overshootClamping: false,
-    },
-    from: 2.8,
+    config: theme.spring.slam,
+    from: 2.2,
     to: 1.0,
   });
+
+  const entranceY = interpolate(scale, [1.0, 2.2], [0, 35], {
+    extrapolateLeft: 'clamp',
+    extrapolateRight: 'clamp',
+  });
+
+  const entranceOpacity = interpolate(scale, [1.0, 1.3, 2.2], [1.0, 0.8, 0], {
+    extrapolateLeft: 'clamp',
+    extrapolateRight: 'clamp',
+  });
+
+  // Micro-movimiento orgánico de respiración si permanece en pantalla > 1s (Regla 7: Idle elements breathe)
+  const idleBreathe = Math.sin(relFrame * 0.12) * 2.5;
 
   // Shake con decaimiento determinista en los primeros frames tras el impacto
   let shakeX = 0;
@@ -68,23 +77,26 @@ export const Slam: React.FC<SlamProps> = ({
     shakeY = (random(`slam-y-${frame}`) * 2 - 1) * shakeIntensity * decay;
   }
 
-  // Opacidad general con fade-out al final
+  // Salida rápida y limpia (Regla 4: Exits are faster than entrances ~8-10f)
   const fadeOutStart = durationInFrames - 6;
-  const opacity =
+  const exitOpacity =
     relFrame >= fadeOutStart
       ? 1 - (relFrame - fadeOutStart) / 6
       : 1;
 
-  // Si la palabra es "HORA 0", agrandar significativamente el tamaño de fuente
+  const totalOpacity = entranceOpacity * exitOpacity;
+
+  // Tamaño de fuente calibrado dentro de SAFE zone
   const calculatedFontSize =
     text.trim().toUpperCase() === 'HORA 0' && fontSize === 94
-      ? 150
+      ? 110
       : fontSize;
 
-  // Asegurar que la posición Y se mantiene dentro de SAFE
+  // Tercio superior estricto (12% del alto = 230 px) para jamás
+  // solaparse con los subtítulos principales ubicados en Y=1300
   const clampedY = Math.min(
-    Math.max(positionY, SAFE.top + 60),
-    1920 - SAFE.bottom - 60
+    Math.max(positionY, 210),
+    300
   );
 
   return (
@@ -108,8 +120,11 @@ export const Slam: React.FC<SlamProps> = ({
           alignItems: 'center',
           justifyContent: 'center',
           textAlign: 'center',
-          transform: `translate(${shakeX}px, ${shakeY}px) scale(${scale})`,
-          opacity,
+          paddingLeft: 40,
+          paddingRight: 40,
+          boxSizing: 'border-box',
+          transform: `translate(${shakeX}px, ${shakeY + entranceY + idleBreathe}px) scale(${scale})`,
+          opacity: totalOpacity,
           lineHeight: 0.95,
         }}
       >
@@ -118,7 +133,7 @@ export const Slam: React.FC<SlamProps> = ({
           <div
             style={{
               position: 'absolute',
-              fontFamily: 'Anton, Impact, sans-serif',
+              fontFamily: theme.fonts.display,
               fontSize: calculatedFontSize,
               fontWeight: 900,
               letterSpacing: 4,
@@ -139,7 +154,7 @@ export const Slam: React.FC<SlamProps> = ({
           <div
             style={{
               position: 'absolute',
-              fontFamily: 'Anton, Impact, sans-serif',
+              fontFamily: theme.fonts.display,
               fontSize: calculatedFontSize,
               fontWeight: 900,
               letterSpacing: 4,
@@ -155,17 +170,17 @@ export const Slam: React.FC<SlamProps> = ({
           </div>
         )}
 
-        {/* Capa Falso Glow duplicada con blur y screen */}
+        {/* Capa Falso Glow calibrada (Regla: solo un elemento con glow dominante) */}
         <div
           style={{
             position: 'absolute',
-            fontFamily: 'Anton, Impact, sans-serif',
+            fontFamily: theme.fonts.display,
             fontSize: calculatedFontSize,
             fontWeight: 900,
             letterSpacing: 4,
             color: accentColor,
-            filter: `blur(18px)`,
-            opacity: 0.9,
+            filter: `blur(16px)`,
+            opacity: 0.85,
             mixBlendMode: 'screen',
             textTransform: 'uppercase',
             whiteSpace: 'nowrap',
@@ -178,14 +193,14 @@ export const Slam: React.FC<SlamProps> = ({
         <div
           style={{
             position: 'relative',
-            fontFamily: 'Anton, Impact, sans-serif',
+            fontFamily: theme.fonts.display,
             fontSize: calculatedFontSize,
             fontWeight: 900,
             letterSpacing: 4,
             color,
             textTransform: 'uppercase',
             whiteSpace: 'nowrap',
-            textShadow: `0 0 16px ${accentColor}, 0 0 35px ${glowColor}, 3px 3px 0 #07030f, -3px -3px 0 #07030f, 3px -3px 0 #07030f, -3px 3px 0 #07030f`,
+            textShadow: `0 0 16px ${accentColor}, 0 0 35px ${glowColor}, 4px 4px 0 #07030f, -4px -4px 0 #07030f, 4px -4px 0 #07030f, -4px 4px 0 #07030f, 0 10px 22px rgba(0,0,0,0.95)`,
           }}
         >
           {text}

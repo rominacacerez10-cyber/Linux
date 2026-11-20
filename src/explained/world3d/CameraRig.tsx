@@ -1,7 +1,8 @@
 import React, { useLayoutEffect, useMemo } from 'react';
 import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
-import { interpolate, random, Easing } from 'remotion';
+import { interpolate, random } from 'remotion';
+import { theme } from '../../theme';
 
 export interface CameraShot {
   from: number;
@@ -52,8 +53,8 @@ export const CameraRig: React.FC<CameraRigProps> = ({ frame, shots }) => {
     Math.max(0, (frame - activeShot.from) / duration)
   );
 
-  // Curva de aceleración cinematográfica suave (Easing.bezier o custom)
-  const defaultEasing = Easing.bezier(0.25, 0.1, 0.25, 1);
+  // Curva de aceleración cinematográfica centralizada desde theme.ts
+  const defaultEasing = theme.ease.cinematic;
   const easingFn = activeShot.easing ?? defaultEasing;
   const shotProgress = easingFn(rawProgress);
 

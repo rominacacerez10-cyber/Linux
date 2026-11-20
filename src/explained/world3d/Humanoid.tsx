@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import * as THREE from 'three';
-import { interpolate, spring } from 'remotion';
+import { spring } from 'remotion';
 
 export type HumanoidPose =
   | 'idle'
@@ -45,17 +45,27 @@ export const Humanoid: React.FC<HumanoidProps> = ({
     () =>
       new THREE.MeshStandardMaterial({
         color: skinColor,
-        roughness: 0.65,
+        roughness: 0.62,
         metalness: 0.05,
         flatShading: true,
       }),
     [skinColor]
   );
+  const hairMat = useMemo(
+    () =>
+      new THREE.MeshStandardMaterial({
+        color: '#1a1016',
+        roughness: 0.8,
+        metalness: 0.1,
+        flatShading: true,
+      }),
+    []
+  );
   const shirtMat = useMemo(
     () =>
       new THREE.MeshStandardMaterial({
         color: shirtColor,
-        roughness: 0.52,
+        roughness: 0.48,
         metalness: 0.15,
         flatShading: true,
       }),
@@ -65,18 +75,36 @@ export const Humanoid: React.FC<HumanoidProps> = ({
     () =>
       new THREE.MeshStandardMaterial({
         color: pantsColor,
-        roughness: 0.62,
-        metalness: 0.1,
+        roughness: 0.58,
+        metalness: 0.12,
         flatShading: true,
       }),
     [pantsColor]
+  );
+  const beltMat = useMemo(
+    () =>
+      new THREE.MeshStandardMaterial({
+        color: '#120a1c',
+        roughness: 0.4,
+        metalness: 0.6,
+      }),
+    []
+  );
+  const buckleMat = useMemo(
+    () =>
+      new THREE.MeshStandardMaterial({
+        color: '#f6d365',
+        roughness: 0.15,
+        metalness: 0.95,
+      }),
+    []
   );
   const jacketMat = useMemo(
     () =>
       new THREE.MeshStandardMaterial({
         color: '#00e5ff',
         emissive: '#00334d',
-        emissiveIntensity: 0.5,
+        emissiveIntensity: 0.6,
         roughness: 0.28,
         metalness: 0.72,
         flatShading: true,
@@ -93,26 +121,62 @@ export const Humanoid: React.FC<HumanoidProps> = ({
       }),
     []
   );
-  const accessoryMat = useMemo(
+  const shoeTrimMat = useMemo(
     () =>
       new THREE.MeshStandardMaterial({
-        color: rimColor,
-        emissive: rimColor,
-        emissiveIntensity: 2.2,
-        roughness: 0.1,
-        metalness: 0.9,
+        color: shirtColor,
+        roughness: 0.4,
+        metalness: 0.3,
+        flatShading: true,
       }),
-    [rimColor]
+    [shirtColor]
+  );
+  const glassesFrameMat = useMemo(
+    () =>
+      new THREE.MeshStandardMaterial({
+        color: '#ffd166',
+        roughness: 0.1,
+        metalness: 0.95,
+      }),
+    []
+  );
+  const glassesLensMat = useMemo(
+    () =>
+      new THREE.MeshStandardMaterial({
+        color: '#080512',
+        roughness: 0.04,
+        metalness: 0.98,
+      }),
+    []
   );
 
-  // Geometrías con pivotes en hombro, cadera y rodilla
-  const headGeo = useMemo(() => new THREE.BoxGeometry(0.36, 0.4, 0.36), []);
-  const torsoGeo = useMemo(() => new THREE.BoxGeometry(0.55, 0.75, 0.35), []);
-  const jacketGeo = useMemo(() => new THREE.BoxGeometry(0.58, 0.77, 0.38), []);
-  const armGeo = useMemo(() => new THREE.BoxGeometry(0.16, 0.65, 0.16), []);
-  const upperLegGeo = useMemo(() => new THREE.BoxGeometry(0.2, 0.42, 0.2), []);
-  const lowerLegGeo = useMemo(() => new THREE.BoxGeometry(0.19, 0.42, 0.19), []);
-  const shoeGeo = useMemo(() => new THREE.BoxGeometry(0.22, 0.16, 0.32), []);
+  // Geometrías anatómicas estilizadas (cabeza redondeada, torso en V, extremidades cilíndricas)
+  const headGeo = useMemo(() => new THREE.SphereGeometry(0.175, 16, 12), []);
+  const jawGeo = useMemo(() => new THREE.SphereGeometry(0.13, 12, 8), []);
+  const noseGeo = useMemo(() => new THREE.BoxGeometry(0.045, 0.07, 0.055), []);
+  const earGeo = useMemo(() => new THREE.SphereGeometry(0.05, 8, 8), []);
+  const neckGeo = useMemo(() => new THREE.CylinderGeometry(0.085, 0.105, 0.17, 10), []);
+  const hairCapGeo = useMemo(
+    () => new THREE.SphereGeometry(0.184, 16, 10, 0, Math.PI * 2, 0, Math.PI * 0.56),
+    []
+  );
+  const hairBackGeo = useMemo(() => new THREE.BoxGeometry(0.3, 0.2, 0.1), []);
+  const sideburnGeo = useMemo(() => new THREE.BoxGeometry(0.035, 0.11, 0.05), []);
+  const chestGeo = useMemo(() => new THREE.CylinderGeometry(0.27, 0.2, 0.46, 10), []);
+  const waistGeo = useMemo(() => new THREE.CylinderGeometry(0.19, 0.165, 0.2, 10), []);
+  const beltGeo = useMemo(() => new THREE.BoxGeometry(0.42, 0.08, 0.29), []);
+  const buckleGeo = useMemo(() => new THREE.BoxGeometry(0.1, 0.085, 0.035), []);
+  const collarGeo = useMemo(() => new THREE.TorusGeometry(0.115, 0.025, 6, 14), []);
+  const jacketGeo = useMemo(() => new THREE.CylinderGeometry(0.295, 0.235, 0.5, 10), []);
+  const shoulderGeo = useMemo(() => new THREE.SphereGeometry(0.105, 10, 8), []);
+  const bicepGeo = useMemo(() => new THREE.CapsuleGeometry(0.075, 0.17, 4, 8), []);
+  const forearmGeo = useMemo(() => new THREE.CapsuleGeometry(0.058, 0.16, 4, 8), []);
+  const handGeo = useMemo(() => new THREE.SphereGeometry(0.075, 8, 6), []);
+  const upperLegGeo = useMemo(() => new THREE.CapsuleGeometry(0.095, 0.26, 4, 8), []);
+  const lowerLegGeo = useMemo(() => new THREE.CapsuleGeometry(0.074, 0.25, 4, 8), []);
+  const shoeGeo = useMemo(() => new THREE.BoxGeometry(0.2, 0.13, 0.34), []);
+  const shoeSoleGeo = useMemo(() => new THREE.BoxGeometry(0.21, 0.045, 0.36), []);
+  const chainGeo = useMemo(() => new THREE.TorusGeometry(0.1, 0.012, 6, 16), []);
 
   // Animaciones y ángulos articulares basados en la pose y frame
   const anim = useMemo(() => {
@@ -174,7 +238,6 @@ export const Humanoid: React.FC<HumanoidProps> = ({
         bodyY = Math.abs(Math.sin(frame * 0.5)) * 0.08;
         bodyPitch = -0.1 + jitter;
         headPitch = -0.3 + jitter;
-        // Brazos levantados en señal de pánico temblando
         leftArmRotX = Math.PI * 0.85 + Math.sin(frame * 0.8) * 0.2;
         rightArmRotX = Math.PI * 0.85 + Math.cos(frame * 0.8) * 0.2;
         leftArmRotZ = 0.4 + jitter;
@@ -186,11 +249,9 @@ export const Humanoid: React.FC<HumanoidProps> = ({
         break;
       }
       case 'celebrate': {
-        // Salto con spring periódico
         const jumpProgress = (frame % 25) / 25;
         const jump = Math.sin(jumpProgress * Math.PI) * 0.4;
         bodyY = jump;
-        // Brazos en V celebrando arriba
         leftArmRotX = Math.PI * 0.85;
         rightArmRotX = Math.PI * 0.85;
         leftArmRotZ = 0.55 + Math.sin(frame * 0.3) * 0.15;
@@ -203,7 +264,6 @@ export const Humanoid: React.FC<HumanoidProps> = ({
         break;
       }
       case 'shock': {
-        // Manos a la cabeza
         bodyPitch = -0.15;
         headPitch = 0.1;
         leftArmRotX = Math.PI * 0.7;
@@ -249,22 +309,28 @@ export const Humanoid: React.FC<HumanoidProps> = ({
   }, [frame, fps, pose]);
 
   return (
-    <group
-      position={position}
-      rotation={rotation}
-      scale={[scale, scale, scale]}
-    >
+    <group position={position} rotation={rotation} scale={[scale, scale, scale]}>
       {/* Contenedor con animación vertical y balanceo */}
       <group
         position={[0, 0.95 + anim.bodyY, 0]}
         rotation={[anim.bodyPitch, 0, anim.bodyRoll]}
       >
-        {/* Torso */}
-        <mesh geometry={torsoGeo} material={shirtMat} position={[0, 0.38, 0]} />
+        {/* Torso atlético en V, cintura afinada y cinturón con hebilla dorada */}
+        <group position={[0, 0.42, 0]}>
+          <mesh geometry={chestGeo} material={shirtMat} position={[0, 0.24, 0]} scale={[1, 1, 0.78]} />
+          <mesh geometry={waistGeo} material={shirtMat} position={[0, -0.02, 0]} scale={[1, 1, 0.76]} />
+          <mesh geometry={beltGeo} material={beltMat} position={[0, -0.15, 0]} />
+          <mesh geometry={buckleGeo} material={buckleMat} position={[0, -0.15, 0.135]} />
+          <mesh geometry={collarGeo} material={shirtMat} position={[0, 0.47, 0]} rotation={[Math.PI / 2, 0, 0]} />
+          <mesh geometry={chainGeo} material={buckleMat} position={[0, 0.43, 0.075]} rotation={[Math.PI / 2, 0, 0]} />
+          {/* Hombros redondeados */}
+          <mesh geometry={shoulderGeo} material={shirtMat} position={[-0.26, 0.4, 0]} scale={[1.1, 0.9, 1]} />
+          <mesh geometry={shoulderGeo} material={shirtMat} position={[0.26, 0.4, 0]} scale={[1.1, 0.9, 1]} />
+        </group>
 
         {/* Chaqueta de accesorio */}
         {accessory === 'jacket' && (
-          <mesh geometry={jacketGeo} material={jacketMat} position={[0, 0.38, 0]} />
+          <mesh geometry={jacketGeo} material={jacketMat} position={[0, 0.56, 0]} scale={[1, 1, 0.82]} />
         )}
 
         {/* Rim Light trasera cian/magenta */}
@@ -276,96 +342,107 @@ export const Humanoid: React.FC<HumanoidProps> = ({
           decay={2}
         />
 
-        {/* Cabeza con pivote en cuello */}
-        <group position={[0, 0.95, 0]} rotation={[anim.headPitch, 0, 0]}>
-          <mesh geometry={headGeo} material={skinMat} />
+        {/* Cuello y cabeza estilizada con peinado Vice City y lentes oscuros */}
+        <group position={[0, 0.84, 0]} rotation={[anim.headPitch, 0, 0]}>
+          <mesh geometry={neckGeo} material={skinMat} position={[0, 0.1, 0]} />
 
-          {/* Accesorios */}
-          {accessory === 'glasses' && (
-            <mesh position={[0, 0.05, 0.2]} material={accessoryMat}>
-              <boxGeometry args={[0.34, 0.08, 0.06]} />
-            </mesh>
-          )}
+          <group position={[0, 0.32, 0]}>
+            {/* Cráneo redondeado */}
+            <mesh geometry={headGeo} material={skinMat} scale={[1, 1.06, 0.94]} />
+            {/* Mandíbula / mentón */}
+            <mesh geometry={jawGeo} material={skinMat} position={[0, -0.115, 0.015]} scale={[1, 0.72, 0.92]} />
+            {/* Nariz */}
+            <mesh geometry={noseGeo} material={skinMat} position={[0, -0.01, 0.17]} />
+            {/* Orejas */}
+            <mesh geometry={earGeo} material={skinMat} position={[-0.172, 0.0, 0]} scale={[0.6, 1, 0.7]} />
+            <mesh geometry={earGeo} material={skinMat} position={[0.172, 0.0, 0]} scale={[0.6, 1, 0.7]} />
 
-          {accessory === 'cap' && (
-            <group position={[0, 0.18, 0]}>
-              <mesh material={pantsMat}>
-                <boxGeometry args={[0.38, 0.1, 0.4]} />
+            {/* Cabello con calota superior, nuca y patillas */}
+            <mesh geometry={hairCapGeo} material={hairMat} position={[0, 0.015, -0.005]} />
+            <mesh geometry={hairBackGeo} material={hairMat} position={[0, 0.035, -0.145]} />
+            <mesh geometry={sideburnGeo} material={hairMat} position={[-0.155, -0.02, 0.035]} />
+            <mesh geometry={sideburnGeo} material={hairMat} position={[0.155, -0.02, 0.035]} />
+
+            {/* Lentes de sol oscuros Vice City con montura dorada */}
+            <group position={[0, 0.035, 0.158]}>
+              <mesh material={glassesFrameMat}>
+                <boxGeometry args={[0.33, 0.025, 0.035]} />
               </mesh>
-              <mesh position={[0, -0.02, 0.22]} material={pantsMat}>
-                <boxGeometry args={[0.34, 0.03, 0.2]} />
+              <mesh position={[-0.083, -0.032, 0.005]} material={glassesLensMat}>
+                <boxGeometry args={[0.125, 0.078, 0.03]} />
+              </mesh>
+              <mesh position={[0.083, -0.032, 0.005]} material={glassesLensMat}>
+                <boxGeometry args={[0.125, 0.078, 0.03]} />
+              </mesh>
+              <mesh position={[-0.155, -0.01, -0.04]} rotation={[0, 0.3, 0]} material={glassesFrameMat}>
+                <boxGeometry args={[0.11, 0.015, 0.02]} />
+              </mesh>
+              <mesh position={[0.155, -0.01, -0.04]} rotation={[0, -0.3, 0]} material={glassesFrameMat}>
+                <boxGeometry args={[0.11, 0.015, 0.02]} />
               </mesh>
             </group>
-          )}
-        </group>
 
-        {/* Brazo Izquierdo (pivote en hombro) */}
-        <group
-          position={[-0.38, 0.7, 0]}
-          rotation={[anim.leftArmRotX, 0, anim.leftArmRotZ]}
-        >
-          <mesh geometry={armGeo} material={shirtMat} position={[0, -0.3, 0]} />
-          {/* Mano */}
-          <mesh
-            geometry={headGeo}
-            material={skinMat}
-            scale={[0.35, 0.35, 0.35]}
-            position={[0, -0.65, 0]}
-          />
-        </group>
-
-        {/* Brazo Derecho (pivote en hombro) */}
-        <group
-          position={[0.38, 0.7, 0]}
-          rotation={[anim.rightArmRotX, 0, anim.rightArmRotZ]}
-        >
-          <mesh geometry={armGeo} material={shirtMat} position={[0, -0.3, 0]} />
-          {/* Mano */}
-          <mesh
-            geometry={headGeo}
-            material={skinMat}
-            scale={[0.35, 0.35, 0.35]}
-            position={[0, -0.65, 0]}
-          />
-        </group>
-
-        {/* Pierna Izquierda (pivotes en cadera y rodilla) */}
-        <group
-          position={[-0.16, 0.0, 0]}
-          rotation={[anim.leftLegRotX, 0, 0]}
-        >
-          {/* Muslo */}
-          <mesh geometry={upperLegGeo} material={pantsMat} position={[0, -0.21, 0]} />
-
-          {/* Rodilla / pantorrilla */}
-          <group position={[0, -0.42, 0]} rotation={[anim.leftKneeRotX, 0, 0]}>
-            <mesh geometry={lowerLegGeo} material={pantsMat} position={[0, -0.21, 0]} />
-            {/* Zapato */}
-            <mesh
-              geometry={shoeGeo}
-              material={shoeMat}
-              position={[0, -0.44, 0.06]}
-            />
+            {/* Accesorio Gorra alternativa */}
+            {accessory === 'cap' && (
+              <group position={[0, 0.19, 0]}>
+                <mesh material={pantsMat}>
+                  <cylinderGeometry args={[0.185, 0.19, 0.11, 12]} />
+                </mesh>
+                <mesh position={[0, -0.05, 0.2]} material={pantsMat}>
+                  <boxGeometry args={[0.3, 0.03, 0.2]} />
+                </mesh>
+              </group>
+            )}
           </group>
         </group>
 
-        {/* Pierna Derecha (pivotes en cadera y rodilla) */}
+        {/* Brazo Izquierdo articulado (hombro, bíceps, antebrazo y mano) */}
         <group
-          position={[0.16, 0.0, 0]}
-          rotation={[anim.rightLegRotX, 0, 0]}
+          position={[-0.33, 0.72, 0]}
+          rotation={[anim.leftArmRotX, 0, anim.leftArmRotZ]}
         >
-          {/* Muslo */}
-          <mesh geometry={upperLegGeo} material={pantsMat} position={[0, -0.21, 0]} />
+          <mesh geometry={shoulderGeo} material={shirtMat} scale={[1.05, 1, 1.05]} />
+          <mesh geometry={bicepGeo} material={shirtMat} position={[0, -0.17, 0]} />
+          <group position={[0, -0.34, 0]} rotation={[0.15, 0, 0]}>
+            <mesh geometry={forearmGeo} material={skinMat} position={[0, -0.16, 0]} />
+            <mesh geometry={handGeo} material={skinMat} position={[0, -0.35, 0.02]} scale={[0.95, 1.15, 0.8]} />
+          </group>
+        </group>
 
-          {/* Rodilla / pantorrilla */}
-          <group position={[0, -0.42, 0]} rotation={[anim.rightKneeRotX, 0, 0]}>
-            <mesh geometry={lowerLegGeo} material={pantsMat} position={[0, -0.21, 0]} />
-            {/* Zapato */}
-            <mesh
-              geometry={shoeGeo}
-              material={shoeMat}
-              position={[0, -0.44, 0.06]}
-            />
+        {/* Brazo Derecho articulado (hombro, bíceps, antebrazo y mano) */}
+        <group
+          position={[0.33, 0.72, 0]}
+          rotation={[anim.rightArmRotX, 0, anim.rightArmRotZ]}
+        >
+          <mesh geometry={shoulderGeo} material={shirtMat} scale={[1.05, 1, 1.05]} />
+          <mesh geometry={bicepGeo} material={shirtMat} position={[0, -0.17, 0]} />
+          <group position={[0, -0.34, 0]} rotation={[0.15, 0, 0]}>
+            <mesh geometry={forearmGeo} material={skinMat} position={[0, -0.16, 0]} />
+            <mesh geometry={handGeo} material={skinMat} position={[0, -0.35, 0.02]} scale={[0.95, 1.15, 0.8]} />
+          </group>
+        </group>
+
+        {/* Pierna Izquierda articulada (cadera, muslo, pantorrilla y zapatilla) */}
+        <group position={[-0.15, 0.12, 0]} rotation={[anim.leftLegRotX, 0, 0]}>
+          <mesh geometry={upperLegGeo} material={pantsMat} position={[0, -0.22, 0]} />
+          <group position={[0, -0.46, 0]} rotation={[anim.leftKneeRotX, 0, 0]}>
+            <mesh geometry={lowerLegGeo} material={pantsMat} position={[0, -0.2, 0]} />
+            <group position={[0, -0.46, 0.06]}>
+              <mesh geometry={shoeGeo} material={shoeTrimMat} />
+              <mesh geometry={shoeSoleGeo} material={shoeMat} position={[0, -0.06, 0.01]} />
+            </group>
+          </group>
+        </group>
+
+        {/* Pierna Derecha articulada (cadera, muslo, pantorrilla y zapatilla) */}
+        <group position={[0.15, 0.12, 0]} rotation={[anim.rightLegRotX, 0, 0]}>
+          <mesh geometry={upperLegGeo} material={pantsMat} position={[0, -0.22, 0]} />
+          <group position={[0, -0.46, 0]} rotation={[anim.rightKneeRotX, 0, 0]}>
+            <mesh geometry={lowerLegGeo} material={pantsMat} position={[0, -0.2, 0]} />
+            <group position={[0, -0.46, 0.06]}>
+              <mesh geometry={shoeGeo} material={shoeTrimMat} />
+              <mesh geometry={shoeSoleGeo} material={shoeMat} position={[0, -0.06, 0.01]} />
+            </group>
           </group>
         </group>
       </group>

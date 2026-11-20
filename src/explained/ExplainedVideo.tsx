@@ -36,6 +36,14 @@ export const ExplainedVideo: React.FC = () => {
   // - Frame 720-728: Glitch fuerte en revelación de misterio
   // - Frame 740-746: Flash en "¿QUÉ?!"
   const isBlackout = frame >= 670 && frame < 678;
+  const isFinale = frame >= 860;
+
+  // Oscurecimiento progresivo del cierre para que los neones y el texto
+  // respiren sobre fondo profundo, sin lavar el plano en blanco.
+  const finaleShade = (() => {
+    if (frame < 860) return 0;
+    return Math.min(0.42, 0.1 + ((frame - 860) / 160) * 0.32);
+  })();
 
   const flashOpacity = (() => {
     if (frame >= 0 && frame <= 14) return (14 - frame) / 14;
@@ -99,19 +107,41 @@ export const ExplainedVideo: React.FC = () => {
         </>
       )}
 
-      {/* Slam Words sincronizadas con el storyboard (máx. 4 palabras) */}
+      {/* Protección de contraste: degradado oscuro detrás de títulos y subtítulos */}
+      <AbsoluteFill
+        style={{
+          pointerEvents: 'none',
+          background:
+            'linear-gradient(180deg, rgba(5,1,14,0.82) 0%, rgba(5,1,14,0.28) 14%, rgba(5,1,14,0) 30%, rgba(5,1,14,0) 62%, rgba(5,1,14,0.55) 82%, rgba(5,1,14,0.86) 100%)',
+          opacity: isFinale ? 1 : 0.75,
+        }}
+      />
+
+      {/* Velo final: cierre oscuro con neones, nunca en blanco */}
+      {finaleShade > 0 && (
+        <AbsoluteFill
+          style={{
+            pointerEvents: 'none',
+            background:
+              'radial-gradient(ellipse at 50% 62%, rgba(20,3,36,0.05) 0%, rgba(4,1,12,0.55) 62%, rgba(2,0,8,0.9) 100%)',
+            opacity: finaleShade,
+          }}
+        />
+      )}
+
+      {/* Slam Words sincronizadas con el storyboard ubicadas en el TERCIO SUPERIOR (Y=230) */}
       {/* 1. HORA 0 al inicio (f0..30) */}
       <Slam
         frame={frame}
         startFrame={0}
         durationInFrames={30}
         text="HORA 0"
-        fontSize={120}
+        fontSize={84}
         color="#ffffff"
         accentColor="#ff2e93"
         glowColor="#00e5ff"
-        positionY={480}
-        shakeIntensity={20}
+        positionY={230}
+        shakeIntensity={18}
       />
 
       {/* 2. LOCO al final de la escena 1 (f90..119) */}
@@ -120,12 +150,12 @@ export const ExplainedVideo: React.FC = () => {
         startFrame={90}
         durationInFrames={29}
         text="LOCO"
-        fontSize={130}
+        fontSize={88}
         color="#ffffff"
         accentColor="#00e5ff"
         glowColor="#ff2e93"
-        positionY={520}
-        shakeIntensity={16}
+        positionY={230}
+        shakeIntensity={14}
       />
 
       {/* 3. DESMADRE en escena 3 (f445..485) */}
@@ -134,12 +164,12 @@ export const ExplainedVideo: React.FC = () => {
         startFrame={445}
         durationInFrames={40}
         text="DESMADRE"
-        fontSize={110}
+        fontSize={76}
         color="#ffffff"
         accentColor="#ff7a3d"
         glowColor="#ff2e93"
-        positionY={500}
-        shakeIntensity={18}
+        positionY={230}
+        shakeIntensity={16}
       />
 
       {/* 4. FÍSICAS en escena 4 (f610..660) */}
@@ -148,12 +178,12 @@ export const ExplainedVideo: React.FC = () => {
         startFrame={610}
         durationInFrames={50}
         text="FÍSICAS"
-        fontSize={120}
+        fontSize={82}
         color="#ffffff"
         accentColor="#00e5ff"
         glowColor="#ff2e93"
-        positionY={500}
-        shakeIntensity={14}
+        positionY={230}
+        shakeIntensity={12}
       />
 
       {/* 5. ¿QUÉ?! en escena 5 (f740..785) */}
@@ -162,12 +192,12 @@ export const ExplainedVideo: React.FC = () => {
         startFrame={740}
         durationInFrames={45}
         text="¿QUÉ?!"
-        fontSize={130}
+        fontSize={84}
         color="#ffffff"
         accentColor="#ff2e93"
         glowColor="#00e5ff"
-        positionY={480}
-        shakeIntensity={22}
+        positionY={230}
+        shakeIntensity={18}
       />
 
       {/* 6. ¿QUÉ HICISTE PRIMERO? en escena 6 (f920..1000) */}
@@ -176,12 +206,12 @@ export const ExplainedVideo: React.FC = () => {
         startFrame={920}
         durationInFrames={80}
         text="¿QUÉ HICISTE PRIMERO?"
-        fontSize={72}
+        fontSize={54}
         color="#ffffff"
         accentColor="#ff7a3d"
         glowColor="#00e5ff"
-        positionY={520}
-        shakeIntensity={10}
+        positionY={230}
+        shakeIntensity={8}
       />
 
       {/* Capa de subtítulos karaoke palabra por palabra */}
@@ -192,12 +222,12 @@ export const ExplainedVideo: React.FC = () => {
         frame={frame}
         width={WIDTH}
         height={HEIGHT}
-        grainOpacity={0.15}
-        halftoneOpacity={0.1}
-        vignetteOpacity={0.4}
+        grainOpacity={isFinale ? 0.12 : 0.15}
+        halftoneOpacity={isFinale ? 0.06 : 0.1}
+        vignetteOpacity={isFinale ? 0.58 : 0.4}
         speedLinesOpacity={speedLinesOpacity}
-        lightLeakOpacity={0.22}
-        flashOpacity={flashOpacity}
+        lightLeakOpacity={isFinale ? 0.06 : 0.22}
+        flashOpacity={isFinale ? 0 : flashOpacity}
         glitchActive={isGlitching}
         chromaticShift={chromaticShift}
         whipBlur={whipBlur}
