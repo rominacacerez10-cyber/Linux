@@ -1,7 +1,7 @@
 import React, { useLayoutEffect, useMemo } from 'react';
 import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
-import { interpolate, random } from 'remotion';
+import { interpolate, random, Easing } from 'remotion';
 
 export interface CameraShot {
   from: number;
@@ -15,6 +15,7 @@ export interface CameraShot {
   rollStart?: number;
   rollEnd?: number;
   shake?: number;
+  easing?: (t: number) => number;
 }
 
 interface CameraRigProps {
@@ -46,12 +47,17 @@ export const CameraRig: React.FC<CameraRigProps> = ({ frame, shots }) => {
   }, [shots, frame]);
 
   const duration = Math.max(1, activeShot.to - activeShot.from);
-  const shotProgress = Math.min(
+  const rawProgress = Math.min(
     1,
     Math.max(0, (frame - activeShot.from) / duration)
   );
 
-  // Posición interpolada
+  // Curva de aceleración cinematográfica suave (Easing.bezier o custom)
+  const defaultEasing = Easing.bezier(0.25, 0.1, 0.25, 1);
+  const easingFn = activeShot.easing ?? defaultEasing;
+  const shotProgress = easingFn(rawProgress);
+
+  // Posición interpolada con easing cinematográfico
   const posX = interpolate(
     shotProgress,
     [0, 1],
@@ -110,12 +116,20 @@ export const CameraRig: React.FC<CameraRigProps> = ({ frame, shots }) => {
       ? (random(`cam-sy-${frame}`) * 2 - 1) * shakeIntensity
       : 0;
 
+  // Deriva orgánica sutil (cinematic handheld/drone drift)
+  const organicSwayX = Math.sin(frame * 0.05) * 0.04 + Math.cos(frame * 0.08) * 0.02;
+  const organicSwayY = Math.cos(frame * 0.04) * 0.03 + Math.sin(frame * 0.09) * 0.02;
+
   const camPos: [number, number, number] = [
-    posX + shakeX,
-    posY + shakeY,
+    posX + shakeX + organicSwayX,
+    posY + shakeY + organicSwayY,
     posZ,
   ];
-  const camLook: [number, number, number] = [lookX, lookY, lookZ];
+  const camLook: [number, number, number] = [
+    lookX + organicSwayX * 0.5,
+    lookY + organicSwayY * 0.5,
+    lookZ,
+  ];
 
   // Matriz de vista y rotación
   const matrix = useMemo(() => {

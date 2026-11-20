@@ -25,8 +25,10 @@ export const Palms: React.FC<PalmsProps> = ({
   );
   const trunkMaterial = useMemo(
     () =>
-      new THREE.MeshLambertMaterial({
+      new THREE.MeshStandardMaterial({
         color: '#2a173b',
+        roughness: 0.85,
+        metalness: 0.1,
         flatShading: true,
       }),
     []
@@ -38,10 +40,12 @@ export const Palms: React.FC<PalmsProps> = ({
   );
   const crownMaterial = useMemo(
     () =>
-      new THREE.MeshLambertMaterial({
+      new THREE.MeshStandardMaterial({
         color: '#00e5ff',
-        emissive: '#005566',
-        emissiveIntensity: 0.25,
+        emissive: '#003344',
+        emissiveIntensity: 0.45,
+        roughness: 0.42,
+        metalness: 0.25,
         flatShading: true,
       }),
     []

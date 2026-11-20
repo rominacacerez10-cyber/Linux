@@ -129,8 +129,10 @@ export const Scene01: React.FC = () => {
             <group position={[3.25, 3.5, 0]}>
               <mesh>
                 <boxGeometry args={[6.4, 6.8, 0.15]} />
-                <meshLambertMaterial
+                <meshStandardMaterial
                   color="#150628"
+                  roughness={0.25}
+                  metalness={0.75}
                   transparent
                   opacity={0.88}
                 />
@@ -155,8 +157,10 @@ export const Scene01: React.FC = () => {
             <group position={[-3.25, 3.5, 0]}>
               <mesh>
                 <boxGeometry args={[6.4, 6.8, 0.15]} />
-                <meshLambertMaterial
+                <meshStandardMaterial
                   color="#150628"
+                  roughness={0.25}
+                  metalness={0.75}
                   transparent
                   opacity={0.88}
                 />

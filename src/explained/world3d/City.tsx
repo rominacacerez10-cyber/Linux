@@ -20,12 +20,14 @@ export const City: React.FC<CityProps> = ({ frame, speed = 0.8 }) => {
   // El mundo avanza en Z de forma continua y suave
   const offsetZ = (frame * speed) % totalLength;
 
-  // Geometrías y materiales compartidos (low poly, flat shading)
+  // Geometrías y materiales compartidos (low poly, flat shading PBR)
   const buildingGeo = useMemo(() => new THREE.BoxGeometry(1, 1, 1), []);
   const buildingMat = useMemo(
     () =>
-      new THREE.MeshLambertMaterial({
-        color: '#130924',
+      new THREE.MeshStandardMaterial({
+        color: '#120822',
+        roughness: 0.68,
+        metalness: 0.35,
         flatShading: true,
       }),
     []
@@ -34,8 +36,11 @@ export const City: React.FC<CityProps> = ({ frame, speed = 0.8 }) => {
   const windowGeo = useMemo(() => new THREE.PlaneGeometry(0.8, 1.2), []);
   const windowMat = useMemo(
     () =>
-      new THREE.MeshBasicMaterial({
+      new THREE.MeshStandardMaterial({
         color: '#ff2e93',
+        emissive: '#ff2e93',
+        emissiveIntensity: 2.6,
+        roughness: 0.1,
       }),
     []
   );
@@ -109,26 +114,26 @@ export const City: React.FC<CityProps> = ({ frame, speed = 0.8 }) => {
         args={[windowGeo, windowMat, totalWindows]}
       />
 
-      {/* Carretera principal */}
+      {/* Carretera principal estilo asfalto húmedo con reflejos neón */}
       <mesh position={[0, -0.05, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[18, 500]} />
-        <meshLambertMaterial color="#090414" />
+        <meshStandardMaterial color="#0a0516" roughness={0.32} metalness={0.65} />
       </mesh>
 
-      {/* Línea divisoria central con neón cyan */}
+      {/* Línea divisoria central con neón cyan emissive */}
       <mesh position={[0, 0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[0.5, 500]} />
-        <meshBasicMaterial color="#00e5ff" />
+        <meshStandardMaterial color="#00e5ff" emissive="#00e5ff" emissiveIntensity={3.2} roughness={0.1} />
       </mesh>
 
-      {/* Bordillos / aceras */}
+      {/* Bordillos / aceras con brillo magenta */}
       <mesh position={[-9.2, 0.2, 0]}>
         <boxGeometry args={[1.6, 0.4, 500]} />
-        <meshLambertMaterial color="#ff2e93" />
+        <meshStandardMaterial color="#ff2e93" emissive="#55002a" emissiveIntensity={0.8} roughness={0.4} metalness={0.3} />
       </mesh>
       <mesh position={[9.2, 0.2, 0]}>
         <boxGeometry args={[1.6, 0.4, 500]} />
-        <meshLambertMaterial color="#ff2e93" />
+        <meshStandardMaterial color="#ff2e93" emissive="#55002a" emissiveIntensity={0.8} roughness={0.4} metalness={0.3} />
       </mesh>
 
       {/* Rejilla retro Synthwave a los lados */}

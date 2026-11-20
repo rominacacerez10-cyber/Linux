@@ -19,32 +19,56 @@ export const Patrol: React.FC<PatrolProps> = ({
   // Barra policial alternando cada 4 frames
   const isRed = Math.floor(frame / 4) % 2 === 0;
 
-  // Materiales
+  // Materiales PBR
   const blackMat = useMemo(
-    () => new THREE.MeshLambertMaterial({ color: '#090812', flatShading: true }),
+    () =>
+      new THREE.MeshStandardMaterial({
+        color: '#090812',
+        roughness: 0.32,
+        metalness: 0.65,
+        flatShading: true,
+      }),
     []
   );
   const whiteMat = useMemo(
-    () => new THREE.MeshLambertMaterial({ color: '#e6e6f0', flatShading: true }),
+    () =>
+      new THREE.MeshStandardMaterial({
+        color: '#f0f0fa',
+        roughness: 0.28,
+        metalness: 0.45,
+        flatShading: true,
+      }),
     []
   );
   const wheelMat = useMemo(
-    () => new THREE.MeshLambertMaterial({ color: '#161520', flatShading: true }),
+    () =>
+      new THREE.MeshStandardMaterial({
+        color: '#161520',
+        roughness: 0.8,
+        metalness: 0.2,
+        flatShading: true,
+      }),
     []
   );
 
   const sirenRedMat = useMemo(
     () =>
-      new THREE.MeshBasicMaterial({
+      new THREE.MeshStandardMaterial({
         color: isRed ? '#ff0033' : '#330009',
+        emissive: isRed ? '#ff0033' : '#110002',
+        emissiveIntensity: isRed ? 4.2 : 0.2,
+        roughness: 0.1,
       }),
     [isRed]
   );
 
   const sirenBlueMat = useMemo(
     () =>
-      new THREE.MeshBasicMaterial({
+      new THREE.MeshStandardMaterial({
         color: !isRed ? '#00e5ff' : '#002033',
+        emissive: !isRed ? '#00e5ff' : '#000814',
+        emissiveIntensity: !isRed ? 4.2 : 0.2,
+        roughness: 0.1,
       }),
     [isRed]
   );

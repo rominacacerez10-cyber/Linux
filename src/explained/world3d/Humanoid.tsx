@@ -40,29 +40,68 @@ export const Humanoid: React.FC<HumanoidProps> = ({
   accessory = 'none',
   rimColor = '#00e5ff',
 }) => {
-  // Materiales compartidos low-poly flat shading
+  // Materiales compartidos low-poly PBR
   const skinMat = useMemo(
-    () => new THREE.MeshLambertMaterial({ color: skinColor, flatShading: true }),
+    () =>
+      new THREE.MeshStandardMaterial({
+        color: skinColor,
+        roughness: 0.65,
+        metalness: 0.05,
+        flatShading: true,
+      }),
     [skinColor]
   );
   const shirtMat = useMemo(
-    () => new THREE.MeshLambertMaterial({ color: shirtColor, flatShading: true }),
+    () =>
+      new THREE.MeshStandardMaterial({
+        color: shirtColor,
+        roughness: 0.52,
+        metalness: 0.15,
+        flatShading: true,
+      }),
     [shirtColor]
   );
   const pantsMat = useMemo(
-    () => new THREE.MeshLambertMaterial({ color: pantsColor, flatShading: true }),
+    () =>
+      new THREE.MeshStandardMaterial({
+        color: pantsColor,
+        roughness: 0.62,
+        metalness: 0.1,
+        flatShading: true,
+      }),
     [pantsColor]
   );
   const jacketMat = useMemo(
-    () => new THREE.MeshLambertMaterial({ color: '#00e5ff', flatShading: true }),
+    () =>
+      new THREE.MeshStandardMaterial({
+        color: '#00e5ff',
+        emissive: '#00334d',
+        emissiveIntensity: 0.5,
+        roughness: 0.28,
+        metalness: 0.72,
+        flatShading: true,
+      }),
     []
   );
   const shoeMat = useMemo(
-    () => new THREE.MeshLambertMaterial({ color: '#ffffff', flatShading: true }),
+    () =>
+      new THREE.MeshStandardMaterial({
+        color: '#ffffff',
+        roughness: 0.35,
+        metalness: 0.2,
+        flatShading: true,
+      }),
     []
   );
   const accessoryMat = useMemo(
-    () => new THREE.MeshBasicMaterial({ color: rimColor }),
+    () =>
+      new THREE.MeshStandardMaterial({
+        color: rimColor,
+        emissive: rimColor,
+        emissiveIntensity: 2.2,
+        roughness: 0.1,
+        metalness: 0.9,
+      }),
     [rimColor]
   );
 

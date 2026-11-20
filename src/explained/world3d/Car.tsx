@@ -30,37 +30,76 @@ export const Car: React.FC<CarProps> = ({
   const wheelRotation = frame * speed * 0.45;
   const bounceY = suspensionBounce ? Math.sin(frame * 0.7) * 0.03 : 0;
 
-  // Materiales compartidos
+  // Materiales compartidos PBR estilizados (lacado deportivo, rines metálicos, neón emissive)
   const bodyMat = useMemo(
-    () => new THREE.MeshLambertMaterial({ color, flatShading: true }),
+    () =>
+      new THREE.MeshStandardMaterial({
+        color,
+        roughness: 0.24,
+        metalness: 0.82,
+        flatShading: true,
+      }),
     [color]
   );
   const cabinMat = useMemo(
     () =>
-      new THREE.MeshLambertMaterial({
-        color: '#080512',
+      new THREE.MeshStandardMaterial({
+        color: '#06030c',
+        roughness: 0.08,
+        metalness: 0.95,
         flatShading: true,
       }),
     []
   );
   const wheelMat = useMemo(
-    () => new THREE.MeshLambertMaterial({ color: '#1a1822', flatShading: true }),
+    () =>
+      new THREE.MeshStandardMaterial({
+        color: '#16141e',
+        roughness: 0.8,
+        metalness: 0.2,
+        flatShading: true,
+      }),
     []
   );
   const rimMat = useMemo(
-    () => new THREE.MeshBasicMaterial({ color: neonColor }),
+    () =>
+      new THREE.MeshStandardMaterial({
+        color: neonColor,
+        emissive: neonColor,
+        emissiveIntensity: 2.4,
+        roughness: 0.2,
+        metalness: 0.7,
+      }),
     [neonColor]
   );
   const headLightMat = useMemo(
-    () => new THREE.MeshBasicMaterial({ color: '#ffffff' }),
+    () =>
+      new THREE.MeshStandardMaterial({
+        color: '#ffffff',
+        emissive: '#ffffff',
+        emissiveIntensity: 3.5,
+        roughness: 0.1,
+      }),
     []
   );
   const brakeLightMat = useMemo(
-    () => new THREE.MeshBasicMaterial({ color: '#ff003c' }),
+    () =>
+      new THREE.MeshStandardMaterial({
+        color: '#ff003c',
+        emissive: '#ff003c',
+        emissiveIntensity: 3.2,
+        roughness: 0.1,
+      }),
     []
   );
   const underglowMat = useMemo(
-    () => new THREE.MeshBasicMaterial({ color: neonColor, transparent: true, opacity: 0.7 }),
+    () =>
+      new THREE.MeshBasicMaterial({
+        color: neonColor,
+        transparent: true,
+        opacity: 0.65,
+        blending: THREE.AdditiveBlending,
+      }),
     [neonColor]
   );
 
@@ -150,6 +189,13 @@ export const Car: React.FC<CarProps> = ({
         <mesh position={[0, 0.04, 0]} rotation={[-Math.PI / 2, 0, 0]} material={underglowMat}>
           <planeGeometry args={[1.7, 3.8]} />
         </mesh>
+        <pointLight
+          position={[0, 0.22, 0]}
+          color={neonColor}
+          intensity={2.2}
+          distance={7}
+          decay={2}
+        />
 
         {/* Ruedas con rotación y rines de neón */}
         {/* Delantera Izquierda */}
