@@ -32,24 +32,48 @@ SAMPLE_RATE = 44100
 
 
 def get_mp3_duration(filepath: str) -> float:
+    # 1. Intentar con ffprobe
     try:
         cmd = [
             "ffprobe",
-            "-v", "error",
+            "-v", "quiet",
             "-show_entries", "format=duration",
-            "-of", "default=noprint_wrappers=1:nokey=1",
+            "-of", "csv=p=0",
             filepath
         ]
         result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=True)
-        dur = float(result.stdout.strip())
-        return dur
+        output = result.stdout.strip()
+        if output:
+            dur = float(output)
+            if dur > 0.0:
+                return dur
     except Exception:
         pass
 
+    # 2. Intentar con mutagen
     try:
         import mutagen.mp3
         audio = mutagen.mp3.MP3(filepath)
-        return float(audio.info.length)
+        dur = float(audio.info.length)
+        if dur > 0.0:
+            return dur
+    except Exception:
+        pass
+
+    # 3. Fallback con ffmpeg decodificando a null
+    try:
+        cmd = [
+            "ffmpeg",
+            "-i", filepath,
+            "-f", "null",
+            "-"
+        ]
+        result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        import re
+        m = re.findall(r"time=(\d+):(\d+):(\d+\.\d+)", result.stderr)
+        if m:
+            hours, minutes, seconds = m[-1]
+            return int(hours) * 3600 + int(minutes) * 60 + float(seconds)
     except Exception:
         pass
 
@@ -76,6 +100,8 @@ async def generate_single_vo(text: str, rate_pct: int, out_path: str):
 
     with open(out_path, "wb") as f:
         f.write(audio_bytes)
+        f.flush()
+        os.fsync(f.fileno())
 
     duration_sec = get_mp3_duration(out_path)
     if duration_sec <= 0.0 and words:
@@ -89,16 +115,24 @@ async def generate_single_vo(text: str, rate_pct: int, out_path: str):
 
 def fallback_word_timings(text: str, total_duration: float):
     raw_words = text.split()
-    if not raw_words:
+    if not raw_words or total_duration <= 0.0:
         return []
-    dur_per_word = total_duration / len(raw_words)
+
+    # Repartir proporcionalmente a la cantidad de caracteres por palabra
+    weights = [max(len(w), 1) for w in raw_words]
+    total_weight = sum(weights)
+
     result = []
-    for i, w in enumerate(raw_words):
+    current_time = 0.0
+    for i, (w, weight) in enumerate(zip(raw_words, weights)):
+        word_dur = total_duration * (weight / total_weight)
+        end_time = total_duration if i == len(raw_words) - 1 else current_time + word_dur
         result.append({
             "text": w,
-            "startSec": round(i * dur_per_word, 3),
-            "endSec": round((i + 1) * dur_per_word, 3)
+            "startSec": round(current_time, 3),
+            "endSec": round(end_time, 3)
         })
+        current_time = end_time
     return result
 
 
@@ -114,17 +148,17 @@ async def generate_all_vo():
         dur = 0.0
         words = []
 
-        while rate <= MAX_RATE:
+        while True:
             print(f"Escena {scene_num}: probando rate +{rate}%...")
             dur, words = await generate_single_vo(text, rate, out_path)
-            if dur <= max_allowed_sec:
+            if dur <= max_allowed_sec or rate >= MAX_RATE:
                 break
-            rate += 3
+            rate = min(rate + 3, MAX_RATE)
 
         if dur > max_allowed_sec:
-            print(f"ADVERTENCIA: Escena {scene_num} dura {dur:.2f}s y excede límite {max_allowed_sec:.2f}s")
+            print(f"ADVERTENCIA: Escena {scene_num} dura {dur:.2f}s y excede límite {max_allowed_sec:.2f}s (rate final +{rate}%)")
         else:
-            print(f"Escena {scene_num}: OK ({dur:.2f}s <= límite {max_allowed_sec:.2f}s)")
+            print(f"Escena {scene_num}: OK ({dur:.2f}s <= límite {max_allowed_sec:.2f}s, rate +{rate}%)")
 
         if not words:
             words = fallback_word_timings(text, dur)
