@@ -32,71 +32,18 @@ SAMPLE_RATE = 44100
 
 
 def get_mp3_duration(filepath: str) -> float:
-    # 1. Intentar con ffprobe
-    try:
-        cmd = [
-            "ffprobe",
-            "-v", "quiet",
-            "-show_entries", "format=duration",
-            "-of", "csv=p=0",
-            filepath
-        ]
-        result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=True)
-        output = result.stdout.strip()
-        if output:
-            dur = float(output)
-            if dur > 0.0:
-                return dur
-    except Exception:
-        pass
-
-    # 2. Intentar con mutagen
-    try:
-        import mutagen.mp3
-        audio = mutagen.mp3.MP3(filepath)
-        dur = float(audio.info.length)
-        if dur > 0.0:
-            return dur
-    except Exception:
-        pass
-
-    # 3. Fallback con ffmpeg decodificando a null
-    try:
-        cmd = [
-            "ffmpeg",
-            "-i", filepath,
-            "-f", "null",
-            "-"
-        ]
-        result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-        import re
-        m = re.findall(r"time=(\d+):(\d+):(\d+\.\d+)", result.stderr)
-        if m:
-            hours, minutes, seconds = m[-1]
-            return int(hours) * 3600 + int(minutes) * 60 + float(seconds)
-    except Exception:
-        pass
-
-    return 0.0
+    import mutagen.mp3
+    return float(mutagen.mp3.MP3(filepath).info.length)
 
 
 async def generate_single_vo(text: str, rate_pct: int, out_path: str):
     rate_str = f"+{rate_pct}%" if rate_pct >= 0 else f"{rate_pct}%"
     communicate = edge_tts.Communicate(text, VOICE, rate=rate_str)
-    words = []
     audio_bytes = bytearray()
 
     async for chunk in communicate.stream():
         if chunk["type"] == "audio":
             audio_bytes.extend(chunk["data"])
-        elif chunk["type"] == "WordBoundary":
-            start_sec = chunk["offset"] / 10_000_000.0
-            dur_sec = chunk["duration"] / 10_000_000.0
-            words.append({
-                "text": chunk["text"],
-                "startSec": round(start_sec, 3),
-                "endSec": round(start_sec + dur_sec, 3)
-            })
 
     with open(out_path, "wb") as f:
         f.write(audio_bytes)
@@ -104,11 +51,7 @@ async def generate_single_vo(text: str, rate_pct: int, out_path: str):
         os.fsync(f.fileno())
 
     duration_sec = get_mp3_duration(out_path)
-    if duration_sec <= 0.0 and words:
-        duration_sec = words[-1]["endSec"]
-
-    if not words and duration_sec > 0.0:
-        words = fallback_word_timings(text, duration_sec)
+    words = fallback_word_timings(text, duration_sec)
 
     return duration_sec, words
 
@@ -159,9 +102,6 @@ async def generate_all_vo():
             print(f"ADVERTENCIA: Escena {scene_num} dura {dur:.2f}s y excede límite {max_allowed_sec:.2f}s (rate final +{rate}%)")
         else:
             print(f"Escena {scene_num}: OK ({dur:.2f}s <= límite {max_allowed_sec:.2f}s, rate +{rate}%)")
-
-        if not words:
-            words = fallback_word_timings(text, dur)
 
         timings.append({
             "scene": scene_num,
@@ -371,7 +311,6 @@ def generate_music_and_sfx():
 
 async def main():
     await generate_all_vo()
-    generate_music_and_sfx()
     print("ETAPA 01 COMPLETADA CON ÉXITO.")
 
 
