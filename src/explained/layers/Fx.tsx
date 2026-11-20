@@ -194,7 +194,7 @@ export const Fx: React.FC<FxProps> = ({
         <AbsoluteFill
           style={{
             backgroundColor: flashColor,
-            opacity: Math.min(1, Math.max(0, flashOpacity)),
+            opacity: Math.min(0.6, Math.max(0, flashOpacity)),
             mixBlendMode: 'lighten',
           }}
         />

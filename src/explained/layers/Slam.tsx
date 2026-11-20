@@ -75,6 +75,12 @@ export const Slam: React.FC<SlamProps> = ({
       ? 1 - (relFrame - fadeOutStart) / 6
       : 1;
 
+  // Si la palabra es "HORA 0", agrandar significativamente el tamaño de fuente
+  const calculatedFontSize =
+    text.trim().toUpperCase() === 'HORA 0' && fontSize === 94
+      ? 150
+      : fontSize;
+
   // Asegurar que la posición Y se mantiene dentro de SAFE
   const clampedY = Math.min(
     Math.max(positionY, SAFE.top + 60),
@@ -113,7 +119,7 @@ export const Slam: React.FC<SlamProps> = ({
             style={{
               position: 'absolute',
               fontFamily: 'Anton, Impact, sans-serif',
-              fontSize,
+              fontSize: calculatedFontSize,
               fontWeight: 900,
               letterSpacing: 4,
               color: glowColor,
@@ -121,6 +127,7 @@ export const Slam: React.FC<SlamProps> = ({
               mixBlendMode: 'screen',
               opacity: 0.75,
               textTransform: 'uppercase',
+              whiteSpace: 'nowrap',
             }}
           >
             {text}
@@ -133,7 +140,7 @@ export const Slam: React.FC<SlamProps> = ({
             style={{
               position: 'absolute',
               fontFamily: 'Anton, Impact, sans-serif',
-              fontSize,
+              fontSize: calculatedFontSize,
               fontWeight: 900,
               letterSpacing: 4,
               color: accentColor,
@@ -141,6 +148,7 @@ export const Slam: React.FC<SlamProps> = ({
               mixBlendMode: 'screen',
               opacity: 0.75,
               textTransform: 'uppercase',
+              whiteSpace: 'nowrap',
             }}
           >
             {text}
@@ -152,7 +160,7 @@ export const Slam: React.FC<SlamProps> = ({
           style={{
             position: 'absolute',
             fontFamily: 'Anton, Impact, sans-serif',
-            fontSize,
+            fontSize: calculatedFontSize,
             fontWeight: 900,
             letterSpacing: 4,
             color: accentColor,
@@ -160,6 +168,7 @@ export const Slam: React.FC<SlamProps> = ({
             opacity: 0.9,
             mixBlendMode: 'screen',
             textTransform: 'uppercase',
+            whiteSpace: 'nowrap',
           }}
         >
           {text}
@@ -170,11 +179,12 @@ export const Slam: React.FC<SlamProps> = ({
           style={{
             position: 'relative',
             fontFamily: 'Anton, Impact, sans-serif',
-            fontSize,
+            fontSize: calculatedFontSize,
             fontWeight: 900,
             letterSpacing: 4,
             color,
             textTransform: 'uppercase',
+            whiteSpace: 'nowrap',
             textShadow: `0 0 16px ${accentColor}, 0 0 35px ${glowColor}, 3px 3px 0 #07030f, -3px -3px 0 #07030f, 3px -3px 0 #07030f, -3px 3px 0 #07030f`,
           }}
         >

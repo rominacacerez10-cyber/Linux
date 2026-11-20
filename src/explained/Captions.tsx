@@ -49,8 +49,8 @@ export const Captions: React.FC = () => {
     return null;
   }
 
-  // Agrupar 3-4 palabras visibles alrededor de la palabra activa (karaoke contextual)
-  const windowSize = 3;
+  // Agrupar 2 palabras a la vez sin encimarse
+  const windowSize = 2;
   const chunkIndex = Math.floor(activeIndex / windowSize);
   const startIndex = chunkIndex * windowSize;
   const visibleWords = allWords.slice(startIndex, startIndex + windowSize);
@@ -65,8 +65,8 @@ export const Captions: React.FC = () => {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        flexWrap: 'wrap',
-        gap: 16,
+        flexWrap: 'nowrap',
+        gap: 20,
         pointerEvents: 'none',
         zIndex: 50,
       }}
@@ -86,7 +86,7 @@ export const Captions: React.FC = () => {
             })
           : 0;
 
-        const scale = isCurrent ? interpolate(pop, [0, 1], [0.9, 1.15]) : 1.0;
+        const scale = isCurrent ? interpolate(pop, [0, 1], [0.95, 1.1]) : 1.0;
         const color = isCurrent ? word.accentColor : isPast ? '#ffffff' : 'rgba(255,255,255,0.45)';
 
         return (
@@ -94,7 +94,7 @@ export const Captions: React.FC = () => {
             key={`${word.text}-${idx}-${word.globalStartFrame}`}
             style={{
               fontFamily: FONT_DISPLAY,
-              fontSize: 64,
+              fontSize: 58,
               lineHeight: 1.1,
               fontWeight: 900,
               textTransform: 'uppercase',
@@ -102,6 +102,7 @@ export const Captions: React.FC = () => {
               color,
               transform: `scale(${scale})`,
               display: 'inline-block',
+              whiteSpace: 'nowrap',
               textShadow: isCurrent
                 ? `0 0 24px ${word.accentColor}, -3px -3px 0 #000, 3px -3px 0 #000, -3px 3px 0 #000, 3px 3px 0 #000, 0 8px 18px rgba(0,0,0,0.9)`
                 : '-2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000, 0 6px 12px rgba(0,0,0,0.8)',
