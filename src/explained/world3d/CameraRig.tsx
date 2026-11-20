@@ -1,4 +1,5 @@
-import React, { useMemo } from 'react';
+import React, { useLayoutEffect, useMemo } from 'react';
+import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { interpolate, random } from 'remotion';
 
@@ -22,6 +23,8 @@ interface CameraRigProps {
 }
 
 export const CameraRig: React.FC<CameraRigProps> = ({ frame, shots }) => {
+  const { camera } = useThree();
+
   // Encontrar el shot activo o usar el primero/último
   const activeShot = useMemo(() => {
     if (shots.length === 0) {
@@ -135,14 +138,14 @@ export const CameraRig: React.FC<CameraRigProps> = ({ frame, shots }) => {
     return [rot.x, rot.y, rot.z] as [number, number, number];
   }, [matrix]);
 
-  return (
-    <perspectiveCamera
-      makeDefault
-      position={camPos}
-      rotation={rotation}
-      fov={fov}
-      near={0.5}
-      far={600}
-    />
-  );
+  useLayoutEffect(() => {
+    camera.position.set(camPos[0], camPos[1], camPos[2]);
+    camera.rotation.set(rotation[0], rotation[1], rotation[2]);
+    if ('fov' in camera && typeof (camera as THREE.PerspectiveCamera).fov === 'number') {
+      (camera as THREE.PerspectiveCamera).fov = fov;
+      camera.updateProjectionMatrix();
+    }
+  }, [camera, camPos, rotation, fov, frame]);
+
+  return null;
 };
