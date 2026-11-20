@@ -1,37 +1,23 @@
-export type Layout = 'impact' | 'feed' | 'contrast' | 'data' | 'reveal' | 'cta';
-
-export type BadgeTone = 'alert' | 'hot' | 'meme' | 'info';
-
-export interface SceneBadge {
-  text: string;
-  tone: BadgeTone;
-}
-
-export interface SceneStat {
-  value: number;
-  suffix: string;
-  label: string;
-}
-
-export interface Scene {
-  id: string;
-  frames: number;
-  layout: Layout;
-  accent: string;
-  accent2: string;
-  badge: SceneBadge;
-  headline: string[];
-  sub: string;
-  stat?: SceneStat;
-  tags: string[];
-  timestamp: string;
-}
-
 export interface SafeZone {
   top: number;
   bottom: number;
   left: number;
   right: number;
+}
+
+export interface Scene {
+  id: string;
+  frames: number;
+  accent: string;
+  accent2: string;
+  headline: string[];
+  tags: string[];
+}
+
+export interface SfxCue {
+  frame: number;
+  file: string;
+  volume: number;
 }
 
 export const FPS = 30;
@@ -45,82 +31,63 @@ export const SAFE: SafeZone = {
   right: 140,
 };
 
+export const VO_DELAY: Record<number, number> = {
+  1: 6,
+  2: 6,
+  3: 6,
+  4: 6,
+  5: 40,
+  6: 8,
+};
+
 export const SCENES: Scene[] = [
   {
-    id: 'scene-01-impact',
-    frames: 150,
-    layout: 'impact',
-    accent: '#ff2e93',
-    accent2: '#ff7a3d',
-    badge: { text: 'ALERTA ROJA', tone: 'alert' },
-    headline: ['ABRIERON', 'LAS PUERTAS', 'DE VICE CITY'],
-    sub: 'Servidores colapsados y streamers gritando en vivo.',
-    stat: { value: 12, suffix: 'M+', label: 'intentos en simultáneo' },
-    tags: ['#GTAVI', '#ViceCity', '#Lanzamiento'],
-    timestamp: 'T+00:00:14',
-  },
-  {
-    id: 'scene-02-feed',
-    frames: 180,
-    layout: 'feed',
-    accent: '#00e5ff',
-    accent2: '#ff2e93',
-    badge: { text: 'TENDENCIA', tone: 'hot' },
-    headline: ['EL FEED', 'EXPLOTÓ POR', 'COMPLETO'],
-    sub: 'Cero horas de sueño y spoilers en cada esquina.',
-    stat: { value: 40, suffix: 'M', label: 'clips compartidos' },
-    tags: ['#Spoilers', '#ViceClips', '#SinDormir'],
-    timestamp: 'T+00:42:08',
-  },
-  {
-    id: 'scene-03-contrast',
-    frames: 180,
-    layout: 'contrast',
-    accent: '#ff7a3d',
-    accent2: '#ffe600',
-    badge: { text: 'MODO CAOS', tone: 'meme' },
-    headline: ['COMUNIDAD VS', 'LEYES DE LA', 'CALLE REAL'],
-    sub: 'Nadie tocó la historia: todos a cazar cocodrilos.',
-    tags: ['#ViceBeach', '#ModoCaos', '#LeyesCero'],
-    timestamp: 'T+01:15:32',
-  },
-  {
-    id: 'scene-04-data',
-    frames: 180,
-    layout: 'data',
-    accent: '#00e5ff',
-    accent2: '#2a0845',
-    badge: { text: 'FÍSICAS TOP', tone: 'info' },
-    headline: ['DETALLES QUE', 'TE ROMPEN', 'LA CABEZA'],
-    sub: 'Físicas hiperrealistas en cada centímetro de chapa.',
-    stat: { value: 60, suffix: ' FPS', label: 'fidelidad visual extrema' },
-    tags: ['#NextGen', '#Graficazos', '#Fisicas'],
-    timestamp: 'T+01:58:19',
-  },
-  {
-    id: 'scene-05-reveal',
-    frames: 170,
-    layout: 'reveal',
+    id: 's01-gancho',
+    frames: 120,
     accent: '#ff2e93',
     accent2: '#00e5ff',
-    badge: { text: 'GIRO TOTAL', tone: 'hot' },
-    headline: ['LOS NPCS YA', 'NO PERDONAN', 'NADA AMIGO'],
-    sub: 'Si la lías en una esquina te recuerdan y te buscan.',
-    tags: ['#NPCsVivos', '#PlotTwist', '#ViceCityIA'],
-    timestamp: 'T+02:33:04',
+    headline: ['HORA 0', 'LOCO'],
+    tags: ['#HORA0', '#VIRAL'],
   },
   {
-    id: 'scene-06-cta',
-    frames: 160,
-    layout: 'cta',
-    accent: '#ffe600',
+    id: 's02-caos',
+    frames: 180,
+    accent: '#00e5ff',
     accent2: '#ff2e93',
-    badge: { text: 'TU TURNO', tone: 'hot' },
-    headline: ['¿CONSOLA HOY', 'O ESPERAS', 'A LA PC?'],
-    sub: 'Comenta tu bando abajo antes de que te spoileen todo.',
-    stat: { value: 89, suffix: 'K', label: 'debates encendidos' },
-    tags: ['#GamerLatino', '#Debate', '#ViceVeredicto'],
-    timestamp: 'T+03:00:00',
+    headline: ['CAOS TOTAL', '999+'],
+    tags: ['#FEED', '#SPAM'],
+  },
+  {
+    id: 's03-locuras',
+    frames: 190,
+    accent: '#ff7a3d',
+    accent2: '#ff2e93',
+    headline: ['DESMADRE'],
+    tags: ['#AUTOSVOLANDO', '#POLICIA'],
+  },
+  {
+    id: 's04-fisicas',
+    frames: 180,
+    accent: '#00e5ff',
+    accent2: '#2a0845',
+    headline: ['FÍSICAS'],
+    tags: ['#DETALLES', '#SLOWMO'],
+  },
+  {
+    id: 's05-giro',
+    frames: 190,
+    accent: '#ff2e93',
+    accent2: '#00e5ff',
+    headline: ['¿QUÉ?!', 'NADIE LO VIO VENIR'],
+    tags: ['#PLOTWIST', '#MISTERIO'],
+  },
+  {
+    id: 's06-cierre',
+    frames: 160,
+    accent: '#ff7a3d',
+    accent2: '#00e5ff',
+    headline: ['¿QUÉ HICISTE', 'PRIMERO?'],
+    tags: ['#FINAL', '#COMENTA'],
   },
 ];
 
@@ -147,3 +114,51 @@ if (TOTAL_FRAMES !== 1020) {
     `Error de sincronización en data.ts: TOTAL_FRAMES debe ser exactamente 1020, pero se calcularon ${TOTAL_FRAMES}. Revisa los frames de cada escena.`
   );
 }
+
+// SFX CUES:
+// - Whoosh / Hit / Glitch 3 frames antes de cada corte entre escenas
+// - Hits en palabras gigantes
+// - Riser antes del giro en escena 5
+// Inicios de escena: [0, 120, 300, 490, 670, 860]
+export const SFX_CUES: SfxCue[] = [
+  // Frame 0: Hit + Sting inicial de HORA 0
+  { frame: 0, file: 'audio/sfx/hit.wav', volume: 0.9 },
+  { frame: 0, file: 'audio/sfx/sting.wav', volume: 0.75 },
+  // Escena 1 (0..120)
+  { frame: 14, file: 'audio/sfx/whoosh.wav', volume: 0.65 },
+  { frame: 90, file: 'audio/sfx/hit.wav', volume: 0.8 },
+  { frame: 92, file: 'audio/sfx/glitch.wav', volume: 0.6 },
+  // Corte a Escena 2 (f120) -> 3 frames antes = 117
+  { frame: 117, file: 'audio/sfx/whoosh.wav', volume: 0.7 },
+
+  // Escena 2 (120..300)
+  { frame: 180, file: 'audio/sfx/pop.wav', volume: 0.6 },
+  { frame: 240, file: 'audio/sfx/whoosh.wav', volume: 0.65 },
+  // Corte a Escena 3 (f300) -> 3 frames antes = 297
+  { frame: 297, file: 'audio/sfx/glitch.wav', volume: 0.7 },
+
+  // Escena 3 (300..490)
+  { frame: 345, file: 'audio/sfx/whoosh.wav', volume: 0.6 },
+  { frame: 395, file: 'audio/sfx/whoosh.wav', volume: 0.65 },
+  { frame: 445, file: 'audio/sfx/hit.wav', volume: 0.85 }, // DESMADRE
+  // Corte a Escena 4 (f490) -> 3 frames antes = 487
+  { frame: 487, file: 'audio/sfx/whoosh.wav', volume: 0.7 },
+
+  // Escena 4 (490..670)
+  { frame: 490, file: 'audio/sfx/hit.wav', volume: 0.85 }, // Choque barrera
+  { frame: 610, file: 'audio/sfx/hit.wav', volume: 0.8 }, // FÍSICAS
+  { frame: 650, file: 'audio/sfx/whoosh.wav', volume: 0.6 },
+  // Corte a Escena 5 (f670) -> 3 frames antes = 667
+  { frame: 667, file: 'audio/sfx/glitch.wav', volume: 0.75 },
+
+  // Escena 5 (670..860): f0-8 silencio total (670-678)
+  { frame: 678, file: 'audio/sfx/riser.wav', volume: 0.85 }, // Riser antes del giro
+  { frame: 720, file: 'audio/sfx/glitch.wav', volume: 0.8 },
+  { frame: 740, file: 'audio/sfx/hit.wav', volume: 0.9 }, // ¿QUÉ?!
+  // Corte a Escena 6 (f860) -> 3 frames antes = 857
+  { frame: 857, file: 'audio/sfx/whoosh.wav', volume: 0.7 },
+
+  // Escena 6 (860..1020)
+  { frame: 920, file: 'audio/sfx/hit.wav', volume: 0.8 }, // ¿QUÉ HICISTE PRIMERO?
+  { frame: 980, file: 'audio/sfx/whoosh.wav', volume: 0.6 },
+];
