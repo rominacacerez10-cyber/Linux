@@ -2,6 +2,7 @@
 import asyncio
 import json
 import os
+import subprocess
 import wave
 import edge_tts
 
@@ -30,6 +31,31 @@ MAX_RATE = 25
 SAMPLE_RATE = 44100
 
 
+def get_mp3_duration(filepath: str) -> float:
+    try:
+        cmd = [
+            "ffprobe",
+            "-v", "error",
+            "-show_entries", "format=duration",
+            "-of", "default=noprint_wrappers=1:nokey=1",
+            filepath
+        ]
+        result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=True)
+        dur = float(result.stdout.strip())
+        return dur
+    except Exception:
+        pass
+
+    try:
+        import mutagen.mp3
+        audio = mutagen.mp3.MP3(filepath)
+        return float(audio.info.length)
+    except Exception:
+        pass
+
+    return 0.0
+
+
 async def generate_single_vo(text: str, rate_pct: int, out_path: str):
     rate_str = f"+{rate_pct}%" if rate_pct >= 0 else f"{rate_pct}%"
     communicate = edge_tts.Communicate(text, VOICE, rate=rate_str)
@@ -51,7 +77,13 @@ async def generate_single_vo(text: str, rate_pct: int, out_path: str):
     with open(out_path, "wb") as f:
         f.write(audio_bytes)
 
-    duration_sec = words[-1]["endSec"] if words else 0.0
+    duration_sec = get_mp3_duration(out_path)
+    if duration_sec <= 0.0 and words:
+        duration_sec = words[-1]["endSec"]
+
+    if not words and duration_sec > 0.0:
+        words = fallback_word_timings(text, duration_sec)
+
     return duration_sec, words
 
 
@@ -138,6 +170,14 @@ def write_wav(filepath: str, samples_left, samples_right, sample_rate=44100):
 
 def generate_music_and_sfx():
     import numpy as np
+
+    sfx_files = ["whoosh.wav", "hit.wav", "riser.wav", "glitch.wav", "pop.wav", "sting.wav"]
+    all_sfx_exist = all(os.path.exists(os.path.join(SFX_DIR, f)) for f in sfx_files)
+    music_exists = os.path.exists(MUSIC_PATH)
+
+    if music_exists and all_sfx_exist:
+        print("Música y SFX ya existen, omitiendo generación.")
+        return
 
     print("--- Sintetizando Música Synthwave y SFX (numpy + wave) ---")
     sr = SAMPLE_RATE
